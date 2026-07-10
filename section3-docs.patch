@@ -1,0 +1,72 @@
+diff --git a/.gitignore b/.gitignore
+--- a/.gitignore
++++ b/.gitignore
+@@ -1,6 +1,7 @@
+ # Frontend dependencies and builds
+ node_modules/
+ .next/
+ out/
++*.tsbuildinfo
+ 
+ # Python environments and caches
+diff --git a/PROJECT_PLAN.md b/PROJECT_PLAN.md
+--- a/PROJECT_PLAN.md
++++ b/PROJECT_PLAN.md
+@@ -16,7 +16,7 @@
+ | Section | Deliverable | Status |
+ | --- | --- | --- |
+ | 1 | Project plan, folder scaffold, README, environment examples, and communication contract | Complete (2026-07-04) |
+ | 2 | FastAPI skeleton and health check | Complete (2026-07-04) |
+-| 3 | Next.js skeleton and landing page | Not started |
++| 3 | Next.js skeleton and landing page | Complete (2026-07-04) |
+ | 4 | Multi-section roadmap form UI | Not started |
+ | 5 | Mock `POST /api/roadmap/generate` response | Not started |
+diff --git a/README.md b/README.md
+--- a/README.md
++++ b/README.md
+@@ -9,5 +9,5 @@
+ ## Current status
+ 
+-Sections 1 and 2 are complete: the repository scaffold is defined and the FastAPI backend exposes a tested health check. The frontend runtime, login, upload, payment, database integration, and RAG implementation have not been added yet.
++Sections 1 through 3 are complete: the repository scaffold is defined, FastAPI exposes a tested health check, and the Next.js frontend has a responsive landing page. Login, upload, payment, database integration, and RAG have not been added.
+ 
+ See [PROJECT_PLAN.md](PROJECT_PLAN.md) for the staged build plan.
+@@ -31,12 +31,17 @@
+ clearpath-germany/
+ |-- frontend/
+ |   |-- app/
++|   |   |-- layout.tsx
++|   |   |-- page.tsx
+ |   |   |-- roadmap/
+ |   |   |-- roadmap-result/
+ |   |   |-- explain/
+ |   |   `-- explain-result/
+ |   |-- components/
+ |   |-- lib/
+ |   |-- styles/
++|   |-- package.json
++|   |-- package-lock.json
++|   |-- README.md
+ |   `-- .env.example
+ |-- backend/
+@@ -110,7 +115,20 @@
+ ```
+ 
+-See [backend/README.md](backend/README.md) for its endpoint and test commands. The frontend run command will be added in Section 3.
++See [backend/README.md](backend/README.md) for its endpoint and test commands.
++
++## Run the frontend
++
++From the repository root:
++
++```powershell
++cd frontend
++npm.cmd install
++Copy-Item .env.example .env.local
++npm.cmd run dev
++```
++
++Open `http://localhost:3000`. See [frontend/README.md](frontend/README.md) for lint, typecheck, build, and production test commands.
+ 
+ ## Section 1 quick test
+ 

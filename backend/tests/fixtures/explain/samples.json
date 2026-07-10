@@ -1,0 +1,26 @@
+[
+  {
+    "name": "admission deadline",
+    "text": "We are pleased to offer you admission. Accept the place by 15 August 2026 and pay the semester fee through the university portal.",
+    "expected_category": "admission",
+    "expected_risk": "medium"
+  },
+  {
+    "name": "visa appointment",
+    "text": "Your German embassy visa appointment is on 2026-09-01. Bring proof of health insurance and your blocked account confirmation.",
+    "expected_category": "visa",
+    "expected_risk": "high"
+  },
+  {
+    "name": "payment request",
+    "text": "Your invoice is ready. Transfer the application fee of 75 EUR before 31 July 2026 and keep the payment receipt.",
+    "expected_category": "payment",
+    "expected_risk": "high"
+  },
+  {
+    "name": "general acknowledgement",
+    "text": "Thank you for contacting our office. We received your message and will send a detailed response after our internal review.",
+    "expected_category": "general",
+    "expected_risk": "low"
+  }
+]

@@ -1,0 +1,86 @@
+[
+  {
+    "city": "Munich",
+    "monthly_estimate_eur": 1300,
+    "notes": "Among the most expensive German cities; rent is the largest cost driver.",
+    "last_verified": "2026-07-04"
+  },
+  {
+    "city": "Berlin",
+    "monthly_estimate_eur": 1100,
+    "notes": "Rising rents but broad housing supply and student options.",
+    "last_verified": "2026-07-04"
+  },
+  {
+    "city": "Frankfurt",
+    "monthly_estimate_eur": 1150,
+    "notes": "Financial hub with higher rent than the national average.",
+    "last_verified": "2026-07-04"
+  },
+  {
+    "city": "Hamburg",
+    "monthly_estimate_eur": 1100,
+    "notes": "Large port city with mid-to-high living costs.",
+    "last_verified": "2026-07-04"
+  },
+  {
+    "city": "Cologne",
+    "monthly_estimate_eur": 1050,
+    "notes": "Moderate costs with a large student population.",
+    "last_verified": "2026-07-04"
+  },
+  {
+    "city": "Aachen",
+    "monthly_estimate_eur": 950,
+    "notes": "Comparatively affordable university city near the border.",
+    "last_verified": "2026-07-04"
+  },
+  {
+    "city": "Heidelberg",
+    "monthly_estimate_eur": 1050,
+    "notes": "Popular student city; rent can be competitive.",
+    "last_verified": "2026-07-04"
+  },
+  {
+    "city": "Stuttgart",
+    "monthly_estimate_eur": 1100,
+    "notes": "Industrial hub with above-average living costs.",
+    "last_verified": "2026-07-04"
+  },
+  {
+    "city": "Dresden",
+    "monthly_estimate_eur": 900,
+    "notes": "One of the more affordable major cities in eastern Germany.",
+    "last_verified": "2026-07-04"
+  },
+  {
+    "city": "Bonn",
+    "monthly_estimate_eur": 1000,
+    "notes": "Moderate costs with a strong research presence.",
+    "last_verified": "2026-07-04"
+  },
+  {
+    "city": "Karlsruhe",
+    "monthly_estimate_eur": 980,
+    "notes": "Affordable technology-focused city.",
+    "last_verified": "2026-07-04"
+  },
+  {
+    "city": "Freiburg",
+    "monthly_estimate_eur": 1050,
+    "notes": "Attractive southern city; housing can be tight.",
+    "last_verified": "2026-07-04"
+  },
+  {
+    "city": "Darmstadt",
+    "monthly_estimate_eur": 1000,
+    "notes": "Engineering-focused city near Frankfurt.",
+    "last_verified": "2026-07-04"
+  },
+  {
+    "city": "Mannheim",
+    "monthly_estimate_eur": 980,
+    "notes": "Business-focused city with moderate costs.",
+    "last_verified": "2026-07-04"
+  }
+]

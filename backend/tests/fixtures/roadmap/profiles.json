@@ -1,0 +1,82 @@
+[
+  {
+    "name": "fresh non-APS applicant",
+    "profile": {
+      "education_status": "bachelor_done",
+      "target_degree": "master",
+      "field": "Computer Science",
+      "target_intake": "winter",
+      "aps_status": "not_required",
+      "study_language": "English",
+      "language_test_status": "not_started",
+      "admission_status": "researching",
+      "finance_status": "not_started",
+      "visa_status": "not_started"
+    },
+    "expected_stage": "plan"
+  },
+  {
+    "name": "Indian applicant preparing APS",
+    "profile": {
+      "education_status": "bachelor_done",
+      "target_degree": "master",
+      "field": "Engineering",
+      "target_intake": "summer",
+      "aps_status": "required",
+      "study_language": "English",
+      "language_test_status": "not_started",
+      "admission_status": "researching",
+      "finance_status": "not_started",
+      "visa_status": "not_started"
+    },
+    "expected_stage": "prepare"
+  },
+  {
+    "name": "submitted applications",
+    "profile": {
+      "education_status": "bachelor_done",
+      "target_degree": "master",
+      "field": "Data Science",
+      "target_intake": "winter",
+      "aps_status": "required",
+      "study_language": "English",
+      "language_test_status": "passed",
+      "admission_status": "applied",
+      "finance_status": "in_progress",
+      "visa_status": "not_started"
+    },
+    "expected_stage": "apply"
+  },
+  {
+    "name": "admitted student preparing visa",
+    "profile": {
+      "education_status": "bachelor_done",
+      "target_degree": "master",
+      "field": "Robotics",
+      "target_intake": "winter",
+      "aps_status": "required",
+      "study_language": "English",
+      "language_test_status": "passed",
+      "admission_status": "admitted",
+      "finance_status": "in_progress",
+      "visa_status": "appointment_booked"
+    },
+    "expected_stage": "visa"
+  },
+  {
+    "name": "visa approved",
+    "profile": {
+      "education_status": "bachelor_done",
+      "target_degree": "master",
+      "field": "Business",
+      "target_intake": "winter",
+      "aps_status": "required",
+      "study_language": "English",
+      "language_test_status": "passed",
+      "admission_status": "admitted",
+      "finance_status": "ready",
+      "visa_status": "approved"
+    },
+    "expected_stage": "arrival"
+  }
+]

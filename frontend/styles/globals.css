@@ -1,0 +1,237 @@
+@import "tailwindcss";
+
+@theme {
+  --color-forest-50: #f1f7f4;
+  --color-forest-600: #25745f;
+  --color-forest-700: #17614f;
+  --color-forest-800: #124b3f;
+  --color-forest-900: #103a32;
+  --color-forest-950: #092c27;
+  --color-lime-200: #dff59c;
+  --color-lime-300: #c9ec72;
+  --color-lime-500: #8fbd2e;
+  --color-cream-50: #fbfaf6;
+  --color-cream-100: #f4f0e6;
+  --color-slate-650: #53615e;
+  --color-amber-50: #fff9e9;
+  --color-amber-100: #fff0bd;
+  --color-amber-500: #d19a24;
+  --color-amber-800: #805719;
+  --font-sans: "Aptos", "Segoe UI", Arial, sans-serif;
+  --font-mono: "Cascadia Mono", "SFMono-Regular", Consolas, monospace;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+html {
+  scroll-behavior: smooth;
+  scroll-padding-top: 5.5rem;
+}
+
+body {
+  margin: 0;
+  background: #fbfaf6;
+  color: #092c27;
+  font-family: var(--font-sans);
+  -webkit-font-smoothing: antialiased;
+}
+
+::selection {
+  background: #c9ec72;
+  color: #092c27;
+}
+
+.skip-link {
+  position: fixed;
+  left: 1rem;
+  top: 1rem;
+  z-index: 100;
+  transform: translateY(-200%);
+  border-radius: 999px;
+  background: #092c27;
+  padding: 0.75rem 1rem;
+  color: white;
+  font-size: 0.875rem;
+  font-weight: 700;
+}
+
+.skip-link:focus {
+  transform: translateY(0);
+}
+
+.nav-link {
+  position: relative;
+  padding-block: 0.5rem;
+  transition: color 160ms ease;
+}
+
+.nav-link::after {
+  position: absolute;
+  right: 0;
+  bottom: 0;
+  left: 0;
+  height: 1px;
+  transform: scaleX(0);
+  background: #17614f;
+  content: "";
+  transition: transform 160ms ease;
+}
+
+.nav-link:hover,
+.nav-link:focus-visible {
+  color: #17614f;
+}
+
+.nav-link:hover::after,
+.nav-link:focus-visible::after {
+  transform: scaleX(1);
+}
+
+.hero-grid {
+  background-image:
+    linear-gradient(rgba(9, 44, 39, 0.045) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(9, 44, 39, 0.045) 1px, transparent 1px);
+  background-size: 48px 48px;
+  mask-image: linear-gradient(to bottom, black, transparent 90%);
+}
+
+.primary-button,
+.secondary-button {
+  display: inline-flex;
+  min-height: 3.25rem;
+  align-items: center;
+  justify-content: center;
+  gap: 0.6rem;
+  border-radius: 999px;
+  padding-inline: 1.4rem;
+  font-size: 0.9rem;
+  font-weight: 700;
+  transition: background-color 160ms ease, color 160ms ease, border-color 160ms ease;
+}
+
+.primary-button {
+  background: #103a32;
+  color: white;
+}
+
+.primary-button:hover {
+  background: #17614f;
+}
+
+.secondary-button {
+  border: 1px solid rgba(9, 44, 39, 0.22);
+  background: rgba(255, 255, 255, 0.65);
+  color: #092c27;
+}
+
+.secondary-button:hover {
+  border-color: #17614f;
+  background: white;
+}
+
+.primary-button:focus-visible,
+.secondary-button:focus-visible {
+  outline: 2px solid #17614f;
+  outline-offset: 3px;
+}
+
+.section-kicker {
+  font-size: 0.75rem;
+  font-weight: 700;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  color: #17614f;
+}
+
+.section-title {
+  margin-top: 1rem;
+  max-width: 42rem;
+  font-size: clamp(2.25rem, 5vw, 3.25rem);
+  font-weight: 600;
+  line-height: 1.08;
+  letter-spacing: -0.045em;
+  color: #092c27;
+}
+
+.section-copy {
+  margin-top: 1.25rem;
+  max-width: 40rem;
+  font-size: 1.1rem;
+  line-height: 1.8;
+  color: #53615e;
+}
+
+.surface-card {
+  border-radius: 1rem;
+  border: 1px solid rgba(9, 44, 39, 0.1);
+  background: white;
+  padding: 1.5rem;
+}
+
+.field-label {
+  display: block;
+  margin-bottom: 0.35rem;
+  font-size: 0.75rem;
+  font-weight: 700;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: #53615e;
+}
+
+.field-input {
+  width: 100%;
+  min-height: 2.75rem;
+  border-radius: 0.75rem;
+  border: 1px solid rgba(9, 44, 39, 0.18);
+  background: white;
+  padding-inline: 0.85rem;
+  font-size: 0.95rem;
+  color: #092c27;
+}
+
+.field-input:focus-visible {
+  outline: 2px solid #17614f;
+  outline-offset: 1px;
+}
+
+.pill {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+  border-radius: 999px;
+  border: 1px solid rgba(23, 97, 79, 0.2);
+  background: white;
+  padding: 0.35rem 0.75rem;
+  font-size: 0.78rem;
+  font-weight: 600;
+  color: #17614f;
+}
+
+.link-underline {
+  font-weight: 600;
+  color: #124b3f;
+  text-decoration: underline;
+  text-decoration-color: #8fbd2e;
+  text-decoration-thickness: 2px;
+  text-underline-offset: 4px;
+}
+
+.link-underline:hover {
+  color: #25745f;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  html {
+    scroll-behavior: auto;
+  }
+
+  *,
+  *::before,
+  *::after {
+    scroll-behavior: auto !important;
+    transition-duration: 0.01ms !important;
+  }
+}
+

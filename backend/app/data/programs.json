@@ -1,0 +1,486 @@
+[
+  {
+    "id": "tum-msc-informatics",
+    "university_id": "tum",
+    "title": "M.Sc. Informatics",
+    "degree_level": "master",
+    "field": "Computer Science",
+    "language": "English",
+    "duration_semesters": 4,
+    "tuition_eur": 0,
+    "intakes": ["winter", "summer"],
+    "deadlines": [
+      { "intake": "winter", "deadline": "2026-05-31" },
+      { "intake": "summer", "deadline": "2026-11-30" }
+    ],
+    "requirements_summary": "Recognized bachelor in computer science or related field, proof of English (IELTS/TOEFL), and an aptitude assessment.",
+    "official_link": "https://www.tum.de/en/studies/degree-programs/detail/informatics-master-of-science-msc",
+    "last_verified": "2026-07-04"
+  },
+  {
+    "id": "tum-msc-mechanical",
+    "university_id": "tum",
+    "title": "M.Sc. Mechanical Engineering",
+    "degree_level": "master",
+    "field": "Mechanical Engineering",
+    "language": "English",
+    "duration_semesters": 4,
+    "tuition_eur": 0,
+    "intakes": ["winter"],
+    "deadlines": [{ "intake": "winter", "deadline": "2026-05-31" }],
+    "requirements_summary": "Bachelor in mechanical engineering, English proficiency, and curricular analysis for eligibility.",
+    "official_link": "https://www.tum.de/en/studies/degree-programs",
+    "last_verified": "2026-07-04"
+  },
+  {
+    "id": "tum-bsc-informatics",
+    "university_id": "tum",
+    "title": "B.Sc. Informatics",
+    "degree_level": "bachelor",
+    "field": "Computer Science",
+    "language": "German",
+    "duration_semesters": 6,
+    "tuition_eur": 0,
+    "intakes": ["winter"],
+    "deadlines": [{ "intake": "winter", "deadline": "2026-07-15" }],
+    "requirements_summary": "University entrance qualification, German proficiency (DSH/TestDaF), and possible VPD via uni-assist.",
+    "official_link": "https://www.tum.de/en/studies/degree-programs",
+    "last_verified": "2026-07-04"
+  },
+  {
+    "id": "lmu-msc-data-science",
+    "university_id": "lmu",
+    "title": "M.Sc. Data Science",
+    "degree_level": "master",
+    "field": "Data Science",
+    "language": "English",
+    "duration_semesters": 4,
+    "tuition_eur": 0,
+    "intakes": ["winter"],
+    "deadlines": [{ "intake": "winter", "deadline": "2026-05-15" }],
+    "requirements_summary": "Bachelor with quantitative background, statistics and programming coursework, and English proficiency.",
+    "official_link": "https://www.lmu.de/en/study/all-degrees-and-programs/",
+    "last_verified": "2026-07-04"
+  },
+  {
+    "id": "lmu-ma-economics",
+    "university_id": "lmu",
+    "title": "M.Sc. Economics",
+    "degree_level": "master",
+    "field": "Economics",
+    "language": "English",
+    "duration_semesters": 4,
+    "tuition_eur": 0,
+    "intakes": ["winter"],
+    "deadlines": [{ "intake": "winter", "deadline": "2026-03-31" }],
+    "requirements_summary": "Bachelor in economics with strong quantitative foundation and English proficiency.",
+    "official_link": "https://www.lmu.de/en/study/all-degrees-and-programs/",
+    "last_verified": "2026-07-04"
+  },
+  {
+    "id": "rwth-msc-mechanical",
+    "university_id": "rwth-aachen",
+    "title": "M.Sc. Mechanical Engineering",
+    "degree_level": "master",
+    "field": "Mechanical Engineering",
+    "language": "German",
+    "duration_semesters": 4,
+    "tuition_eur": 0,
+    "intakes": ["winter", "summer"],
+    "deadlines": [
+      { "intake": "winter", "deadline": "2026-07-01" },
+      { "intake": "summer", "deadline": "2027-01-15" }
+    ],
+    "requirements_summary": "Bachelor in mechanical engineering, German proficiency, and application via uni-assist.",
+    "official_link": "https://www.rwth-aachen.de/cms/root/studium/studienangebot/~jhx/liste-master/",
+    "last_verified": "2026-07-04"
+  },
+  {
+    "id": "rwth-msc-cs",
+    "university_id": "rwth-aachen",
+    "title": "M.Sc. Computer Science",
+    "degree_level": "master",
+    "field": "Computer Science",
+    "language": "English",
+    "duration_semesters": 4,
+    "tuition_eur": 0,
+    "intakes": ["winter", "summer"],
+    "deadlines": [
+      { "intake": "winter", "deadline": "2026-03-01" },
+      { "intake": "summer", "deadline": "2026-09-01" }
+    ],
+    "requirements_summary": "Bachelor in computer science, English proficiency, and application via uni-assist.",
+    "official_link": "https://www.rwth-aachen.de/cms/root/studium/studienangebot/~jhx/liste-master/",
+    "last_verified": "2026-07-04"
+  },
+  {
+    "id": "tu-berlin-msc-cs",
+    "university_id": "tu-berlin",
+    "title": "M.Sc. Computer Science",
+    "degree_level": "master",
+    "field": "Computer Science",
+    "language": "English",
+    "duration_semesters": 4,
+    "tuition_eur": 0,
+    "intakes": ["winter", "summer"],
+    "deadlines": [
+      { "intake": "winter", "deadline": "2026-05-15" },
+      { "intake": "summer", "deadline": "2026-11-15" }
+    ],
+    "requirements_summary": "Bachelor in computer science or related field, English proficiency, and application via uni-assist.",
+    "official_link": "https://www.tu.berlin/en/studying/study-programs",
+    "last_verified": "2026-07-04"
+  },
+  {
+    "id": "tu-berlin-msc-ee",
+    "university_id": "tu-berlin",
+    "title": "M.Sc. Electrical Engineering",
+    "degree_level": "master",
+    "field": "Electrical Engineering",
+    "language": "German",
+    "duration_semesters": 4,
+    "tuition_eur": 0,
+    "intakes": ["winter"],
+    "deadlines": [{ "intake": "winter", "deadline": "2026-05-15" }],
+    "requirements_summary": "Bachelor in electrical engineering, German proficiency, and application via uni-assist.",
+    "official_link": "https://www.tu.berlin/en/studying/study-programs",
+    "last_verified": "2026-07-04"
+  },
+  {
+    "id": "hu-berlin-msc-statistics",
+    "university_id": "hu-berlin",
+    "title": "M.Sc. Statistics",
+    "degree_level": "master",
+    "field": "Statistics",
+    "language": "English",
+    "duration_semesters": 4,
+    "tuition_eur": 0,
+    "intakes": ["winter"],
+    "deadlines": [{ "intake": "winter", "deadline": "2026-06-30" }],
+    "requirements_summary": "Bachelor with quantitative methods coursework and English proficiency.",
+    "official_link": "https://www.hu-berlin.de/en/studies/counselling/course-catalogue",
+    "last_verified": "2026-07-04"
+  },
+  {
+    "id": "heidelberg-msc-physics",
+    "university_id": "heidelberg",
+    "title": "M.Sc. Physics",
+    "degree_level": "master",
+    "field": "Physics",
+    "language": "English",
+    "duration_semesters": 4,
+    "tuition_eur": 0,
+    "intakes": ["winter", "summer"],
+    "deadlines": [
+      { "intake": "winter", "deadline": "2026-06-15" },
+      { "intake": "summer", "deadline": "2026-12-15" }
+    ],
+    "requirements_summary": "Bachelor in physics or related field and English proficiency.",
+    "official_link": "https://www.uni-heidelberg.de/en/study/all-subjects",
+    "last_verified": "2026-07-04"
+  },
+  {
+    "id": "heidelberg-msc-molecular",
+    "university_id": "heidelberg",
+    "title": "M.Sc. Molecular Biosciences",
+    "degree_level": "master",
+    "field": "Life Sciences",
+    "language": "English",
+    "duration_semesters": 4,
+    "tuition_eur": 1500,
+    "intakes": ["winter"],
+    "deadlines": [{ "intake": "winter", "deadline": "2026-04-15" }],
+    "requirements_summary": "Bachelor in biosciences, laboratory experience, and English proficiency.",
+    "official_link": "https://www.uni-heidelberg.de/en/study/all-subjects",
+    "last_verified": "2026-07-04"
+  },
+  {
+    "id": "kit-msc-mechatronics",
+    "university_id": "kit",
+    "title": "M.Sc. Mechatronics and Information Technology",
+    "degree_level": "master",
+    "field": "Mechatronics",
+    "language": "German",
+    "duration_semesters": 4,
+    "tuition_eur": 0,
+    "intakes": ["winter", "summer"],
+    "deadlines": [
+      { "intake": "winter", "deadline": "2026-09-30" },
+      { "intake": "summer", "deadline": "2027-03-31" }
+    ],
+    "requirements_summary": "Bachelor in a related engineering field and German proficiency.",
+    "official_link": "https://www.kit.edu/studying/study-offer.php",
+    "last_verified": "2026-07-04"
+  },
+  {
+    "id": "tu-darmstadt-msc-ce",
+    "university_id": "tu-darmstadt",
+    "title": "M.Sc. Computational Engineering",
+    "degree_level": "master",
+    "field": "Computer Science",
+    "language": "English",
+    "duration_semesters": 4,
+    "tuition_eur": 0,
+    "intakes": ["winter", "summer"],
+    "deadlines": [
+      { "intake": "winter", "deadline": "2026-07-15" },
+      { "intake": "summer", "deadline": "2027-01-15" }
+    ],
+    "requirements_summary": "Bachelor in engineering or computer science, mathematics background, and English proficiency.",
+    "official_link": "https://www.tu-darmstadt.de/studieren/studieninteressierte/",
+    "last_verified": "2026-07-04"
+  },
+  {
+    "id": "uni-stuttgart-msc-infotech",
+    "university_id": "uni-stuttgart",
+    "title": "M.Sc. Information Technology",
+    "degree_level": "master",
+    "field": "Electrical Engineering",
+    "language": "English",
+    "duration_semesters": 4,
+    "tuition_eur": 0,
+    "intakes": ["winter", "summer"],
+    "deadlines": [
+      { "intake": "winter", "deadline": "2026-07-15" },
+      { "intake": "summer", "deadline": "2027-01-15" }
+    ],
+    "requirements_summary": "Bachelor in electrical engineering or computer science and English proficiency.",
+    "official_link": "https://www.uni-stuttgart.de/en/study/study-programs/",
+    "last_verified": "2026-07-04"
+  },
+  {
+    "id": "uni-freiburg-msc-renewable",
+    "university_id": "uni-freiburg",
+    "title": "M.Sc. Renewable Energy Engineering and Management",
+    "degree_level": "master",
+    "field": "Energy",
+    "language": "English",
+    "duration_semesters": 4,
+    "tuition_eur": 3000,
+    "intakes": ["winter"],
+    "deadlines": [{ "intake": "winter", "deadline": "2026-03-15" }],
+    "requirements_summary": "Bachelor in engineering, sciences, or economics with relevant background and English proficiency.",
+    "official_link": "https://www.studium.uni-freiburg.de/en/study-programs",
+    "last_verified": "2026-07-04"
+  },
+  {
+    "id": "goethe-frankfurt-msc-finance",
+    "university_id": "goethe-frankfurt",
+    "title": "M.Sc. Money and Finance",
+    "degree_level": "master",
+    "field": "Finance",
+    "language": "English",
+    "duration_semesters": 4,
+    "tuition_eur": 0,
+    "intakes": ["winter"],
+    "deadlines": [{ "intake": "winter", "deadline": "2026-05-31" }],
+    "requirements_summary": "Bachelor in economics or finance with quantitative coursework and English proficiency.",
+    "official_link": "https://www.goethe-university-frankfurt.de/en/study/degree-programs",
+    "last_verified": "2026-07-04"
+  },
+  {
+    "id": "uni-hamburg-msc-cs",
+    "university_id": "uni-hamburg",
+    "title": "M.Sc. Computer Science",
+    "degree_level": "master",
+    "field": "Computer Science",
+    "language": "English",
+    "duration_semesters": 4,
+    "tuition_eur": 0,
+    "intakes": ["winter", "summer"],
+    "deadlines": [
+      { "intake": "winter", "deadline": "2026-05-31" },
+      { "intake": "summer", "deadline": "2026-11-30" }
+    ],
+    "requirements_summary": "Bachelor in computer science or related field and English proficiency.",
+    "official_link": "https://www.uni-hamburg.de/en/studium/studienangebot.html",
+    "last_verified": "2026-07-04"
+  },
+  {
+    "id": "uni-koeln-msc-management",
+    "university_id": "uni-koeln",
+    "title": "M.Sc. Business Administration",
+    "degree_level": "master",
+    "field": "Business",
+    "language": "English",
+    "duration_semesters": 4,
+    "tuition_eur": 0,
+    "intakes": ["winter"],
+    "deadlines": [{ "intake": "winter", "deadline": "2026-06-15" }],
+    "requirements_summary": "Bachelor in business or economics, quantitative methods, and English proficiency.",
+    "official_link": "https://www.wiso.uni-koeln.de/en/studies",
+    "last_verified": "2026-07-04"
+  },
+  {
+    "id": "uni-bonn-msc-economics",
+    "university_id": "uni-bonn",
+    "title": "M.Sc. Economics",
+    "degree_level": "master",
+    "field": "Economics",
+    "language": "English",
+    "duration_semesters": 4,
+    "tuition_eur": 0,
+    "intakes": ["winter"],
+    "deadlines": [{ "intake": "winter", "deadline": "2026-03-15" }],
+    "requirements_summary": "Bachelor in economics with strong quantitative foundation and English proficiency.",
+    "official_link": "https://www.uni-bonn.de/en/studying/study-programs",
+    "last_verified": "2026-07-04"
+  },
+  {
+    "id": "tu-dresden-msc-nanoelectronics",
+    "university_id": "tu-dresden",
+    "title": "M.Sc. Nanoelectronic Systems",
+    "degree_level": "master",
+    "field": "Electrical Engineering",
+    "language": "English",
+    "duration_semesters": 4,
+    "tuition_eur": 0,
+    "intakes": ["winter"],
+    "deadlines": [{ "intake": "winter", "deadline": "2026-05-31" }],
+    "requirements_summary": "Bachelor in electrical engineering or related field and English proficiency.",
+    "official_link": "https://tu-dresden.de/studium/vor-dem-studium/studienangebot",
+    "last_verified": "2026-07-04"
+  },
+  {
+    "id": "uni-mannheim-msc-management",
+    "university_id": "uni-mannheim",
+    "title": "M.Sc. Management",
+    "degree_level": "master",
+    "field": "Business",
+    "language": "English",
+    "duration_semesters": 4,
+    "tuition_eur": 0,
+    "intakes": ["winter", "summer"],
+    "deadlines": [
+      { "intake": "winter", "deadline": "2026-06-30" },
+      { "intake": "summer", "deadline": "2026-11-30" }
+    ],
+    "requirements_summary": "Bachelor in business or economics with strong grades and English proficiency.",
+    "official_link": "https://www.uni-mannheim.de/en/academics/programs/",
+    "last_verified": "2026-07-04"
+  },
+  {
+    "id": "uni-mannheim-bsc-business",
+    "university_id": "uni-mannheim",
+    "title": "B.Sc. Business Administration",
+    "degree_level": "bachelor",
+    "field": "Business",
+    "language": "German",
+    "duration_semesters": 6,
+    "tuition_eur": 0,
+    "intakes": ["winter"],
+    "deadlines": [{ "intake": "winter", "deadline": "2026-07-15" }],
+    "requirements_summary": "University entrance qualification, German proficiency, and possible VPD via uni-assist.",
+    "official_link": "https://www.uni-mannheim.de/en/academics/programs/",
+    "last_verified": "2026-07-04"
+  }
+,
+  {
+    "id": "passau-msc-computer-science",
+    "university_id": "uni-passau",
+    "title": "M.Sc. Computer Science",
+    "degree_level": "master",
+    "field": "Computer Science",
+    "language": "English",
+    "duration_semesters": 4,
+    "tuition_eur": 0,
+    "intakes": ["winter", "summer"],
+    "deadlines": [
+      {
+        "intake": "summer",
+        "deadline": "2026-12-15",
+        "deadline_note": "Official summer application period is 1 November to 15 December; shown for summer semester 2027."
+      },
+      {
+        "intake": "winter",
+        "deadline": "2027-05-31",
+        "deadline_note": "Official winter deadline is 31 May for direct and uni-assist applications; shown for winter semester 2027."
+      }
+    ],
+    "requirements_summary": "Bachelor in computer science or a related discipline with at least 110 ECTS in computer science, qualifying grade/ranking, thesis or research-paper abstract, and English or German language proof. A1 German is required by the end of the first year if studying only in English.",
+    "official_link": "https://www.uni-passau.de/en/msc-computer-science",
+    "last_verified": "2026-07-09",
+    "source_note": "Official page states no tuition fees and lists direct/uni-assist winter windows plus the summer window."
+  },
+  {
+    "id": "ovgu-msc-data-knowledge-engineering",
+    "university_id": "ovgu-magdeburg",
+    "title": "M.Sc. Data and Knowledge Engineering",
+    "degree_level": "master",
+    "field": "Data Science",
+    "language": "English",
+    "duration_semesters": 4,
+    "tuition_eur": 0,
+    "intakes": ["winter", "summer"],
+    "deadlines": [
+      {
+        "intake": "summer",
+        "deadline": "2026-11-15",
+        "deadline_note": "International bachelor's degree applicants apply via uni-assist by 15 November; shown for summer semester 2027."
+      },
+      {
+        "intake": "winter",
+        "deadline": "2027-05-15",
+        "deadline_note": "International bachelor's degree applicants apply via uni-assist by 15 May; shown for winter semester 2027."
+      }
+    ],
+    "requirements_summary": "Bachelor in computer science, data science, statistics, or a related field with required CS/statistics coursework, minimum German-scale grade of 2.30, and German or English at C1.",
+    "official_link": "https://www.ovgu.de/en/Study/Study+Programmes/Master/Data+and+Knowledge+Engineering.html",
+    "last_verified": "2026-07-09",
+    "source_note": "Official page separates deadlines for German bachelor's applicants and international bachelor's applicants; catalog uses the international/uni-assist dates relevant to Indian applicants."
+  },
+  {
+    "id": "ovgu-msc-digital-engineering",
+    "university_id": "ovgu-magdeburg",
+    "title": "M.Sc. Digital Engineering",
+    "degree_level": "master",
+    "field": "Engineering",
+    "language": "English",
+    "duration_semesters": 4,
+    "tuition_eur": 0,
+    "intakes": ["winter", "summer"],
+    "deadlines": [
+      {
+        "intake": "summer",
+        "deadline": "2026-11-15",
+        "deadline_note": "International bachelor's degree applicants apply via uni-assist by 15 November; shown for summer semester 2027."
+      },
+      {
+        "intake": "winter",
+        "deadline": "2027-05-15",
+        "deadline_note": "International bachelor's degree applicants apply via uni-assist by 15 May; shown for winter semester 2027."
+      }
+    ],
+    "requirements_summary": "Bachelor in digital engineering, engineering, computer science, or a related field with a minimum German-scale grade of 2.50 and German or English at C1. The program can be completed in English.",
+    "official_link": "https://www.ovgu.de/en/Study/Study+Programmes/Master/Digital+Engineering.html",
+    "last_verified": "2026-07-09",
+    "source_note": "Official page separates deadlines for German bachelor's applicants and international bachelor's applicants; catalog uses the international/uni-assist dates relevant to Indian applicants."
+  },
+  {
+    "id": "h-brs-msc-autonomous-systems",
+    "university_id": "h-brs",
+    "title": "M.Sc. Autonomous Systems",
+    "degree_level": "master",
+    "field": "Robotics",
+    "language": "English",
+    "duration_semesters": 4,
+    "tuition_eur": 0,
+    "intakes": ["winter", "summer"],
+    "deadlines": [
+      {
+        "intake": "summer",
+        "deadline": "2026-07-15",
+        "deadline_note": "Visa-required applicants with a foreign bachelor's degree apply via uni-assist from 15 May to 15 July for the following summer semester; shown for summer semester 2027."
+      },
+      {
+        "intake": "winter",
+        "deadline": "2027-02-15",
+        "deadline_note": "Visa-required applicants with a foreign bachelor's degree apply via uni-assist from 15 November to 15 February for the respective winter semester; shown for winter semester 2027."
+      }
+    ],
+    "requirements_summary": "Bachelor or equivalent with sufficient computer science content, minimum German-scale grade of 2.5, CV, motivation letter, and recognized English proof at B2+ CEFR. No German certificate is required.",
+    "official_link": "https://www.h-brs.de/en/inf/admission-application-master-autonomous-systems",
+    "last_verified": "2026-07-09",
+    "source_note": "Official H-BRS admission page distinguishes visa-required applicants and routes them through uni-assist; catalog uses that India-relevant deadline track."
+  }
+]
