@@ -32,3 +32,12 @@ Thumbs.db
 # Logs
 *.log
 
+# Wrangler
+frontend/.wrangler/
+
+# Node
+node_modules/
+
+# Environment variables
+.env
+.env.local
