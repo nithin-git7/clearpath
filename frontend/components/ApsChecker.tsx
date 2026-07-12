@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 
+import { formatDate } from "@/lib/catalog";
 import { lookupApsCountry, type ApsCountry } from "@/lib/aps";
 import type { ApsStatus } from "@/lib/roadmap";
 
@@ -70,7 +71,7 @@ export default function ApsChecker({ currentStatus, onStatusChange }: ApsChecker
         <div className="mt-4 rounded-lg bg-amber-50 px-4 py-3 text-sm text-amber-900">
           <p className="font-semibold">APS likely required for {match.name}.</p>
           <p className="mt-1">
-            Start early — it can take months.{" "}
+            Treat APS as an early, potentially long-lead step and check the current procedure. Source checked {formatDate(match.last_verified)}.{" "}
             <a href={match.portal} target="_blank" rel="noreferrer" className="link-underline">
               Open the official APS portal
             </a>

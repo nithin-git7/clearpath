@@ -1,34 +1,54 @@
 import Link from "next/link";
 
-const helpAreas = [
-  ["01", "A roadmap built around you", "Turn your education, target intake, language status, budget, and goal into a clear sequence of stages."],
-  ["02", "Documents and deadlines", "Separate what you need now from what comes later, then keep important dates and missing items visible."],
-  ["03", "Application path clarity", "Understand whether a university mentions direct application, uni-assist, or a VPD before you act."],
-  ["04", "Plain-language explanations", "Turn confusing official text into a simple meaning, questions, and concrete next actions."],
+import SiteFooter from "@/components/SiteFooter";
+import { formatDate } from "@/lib/catalog";
+import { OFFICIAL_FACTS, SITE_INFORMATION_LAST_REVIEWED } from "@/lib/official-info-data";
+
+const START_PATHS = [
+  {
+    stage: "I am still exploring",
+    title: "Find realistic programs",
+    body: "Search by degree, subject, language, city, intake, and tuition. Compare the facts that change a decision.",
+    href: "/explore",
+    action: "Explore programs",
+  },
+  {
+    stage: "I am preparing applications",
+    title: "Build my exact sequence",
+    body: "Turn education, APS, language, intake, and finance status into a staged action plan.",
+    href: "/roadmap",
+    action: "Build my roadmap",
+  },
+  {
+    stage: "I have an offer or official email",
+    title: "Understand what it asks",
+    body: "Extract the meaning, dates, amounts, risk level, next actions, and a safe reply draft.",
+    href: "/explain",
+    action: "Explain a message",
+  },
+  {
+    stage: "I am preparing to move",
+    title: "Plan money and arrival",
+    body: "See a complete budget, financial-proof reference, and the steps that follow admission.",
+    href: "/finance",
+    action: "Plan my finances",
+  },
 ] as const;
 
-const roadmapStages = [
-  ["Plan", "Set your goal, target intake, field, and realistic preparation window."],
-  ["Prepare", "Organize tests, academic documents, APS context, and application requirements."],
-  ["Apply", "Track application paths, deadlines, submissions, and questions that need confirmation."],
-  ["Move forward", "Prepare for visa, arrival, and the transition from study planning to a Germany job path."],
+const TOOLKIT = [
+  ["Program explorer", "Build a source-backed shortlist instead of collecting random browser tabs.", "/explore"],
+  ["Decision comparison", "Compare up to three programs across requirements, costs, intake, and deadline.", "/compare"],
+  ["Deadline intelligence", "Separate future, near, and passed cycles—and always verify your applicant category.", "/deadlines"],
+  ["Application workspace", "Save programs and complete a separate checklist for every application.", "/shortlist"],
+  ["Finance readiness", "Calculate monthly costs, setup costs, runway, and the funding gap.", "/finance"],
+  ["Official-language decoder", "Turn dense university, APS, visa, or insurance text into concrete actions.", "/explain"],
 ] as const;
 
-function ArrowIcon() {
-  return (
-    <svg aria-hidden="true" className="size-4" viewBox="0 0 16 16" fill="none">
-      <path d="M3 8h9M8.5 4.5 12 8l-3.5 3.5" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round" />
-    </svg>
-  );
-}
-
-function CheckIcon() {
-  return (
-    <svg aria-hidden="true" className="size-4" viewBox="0 0 16 16" fill="none">
-      <path d="m3.5 8.2 2.8 2.8 6.2-6.2" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" />
-    </svg>
-  );
-}
+const CURRENT_UPDATES = [
+  OFFICIAL_FACTS.studentFinance,
+  OFFICIAL_FACTS.uniAssistTiming,
+  OFFICIAL_FACTS.apsIndiaDmat,
+] as const;
 
 export default function HomePage() {
   return (
@@ -39,51 +59,62 @@ export default function HomePage() {
 
         <div className="relative mx-auto grid max-w-7xl gap-14 px-5 py-18 sm:px-8 sm:py-24 lg:grid-cols-[1.08fr_0.92fr] lg:items-center lg:gap-20 lg:px-10 lg:py-28">
           <div>
-            <p className="mb-6 inline-flex items-center gap-2 rounded-full border border-forest-700/20 bg-white/70 px-3 py-1.5 text-xs font-semibold uppercase tracking-[0.17em] text-forest-700">
+            <p className="mb-6 inline-flex items-center gap-2 rounded-full border border-forest-700/20 bg-white/75 px-3 py-1.5 text-xs font-semibold uppercase tracking-[0.17em] text-forest-700">
               <span className="size-1.5 rounded-full bg-lime-500" />
-              Independent planning. Official verification.
+              Independent planning · official verification
             </p>
             <h1 className="max-w-3xl text-balance text-5xl font-semibold leading-[1.02] tracking-[-0.055em] text-forest-950 sm:text-6xl lg:text-[4.6rem]">
-              Apply to Germany without feeling lost.
+              Germany applications are messy. Your plan should not be.
             </h1>
             <p className="mt-7 max-w-2xl text-pretty text-lg leading-8 text-slate-650 sm:text-xl">
-              ClearPath Germany helps students build a step-by-step Germany study and career roadmap, understand documents, track next actions, and avoid confusion.
+              ClearPath turns programs, APS, uni-assist, documents, deadlines, finances, visa preparation,
+              and arrival into one personal control room—with the official source beside every critical fact.
             </p>
             <div className="mt-9 flex flex-col gap-3 sm:flex-row">
-              <Link className="primary-button" href="/roadmap">Build My Germany Roadmap <ArrowIcon /></Link>
-              <Link className="secondary-button" href="/explain">Explain A Confusing Document</Link>
+              <Link className="primary-button" href="/roadmap">Build my Germany roadmap <span aria-hidden="true">→</span></Link>
+              <Link className="secondary-button" href="/hub">Open my control room</Link>
             </div>
             <ul className="mt-8 flex flex-wrap gap-x-6 gap-y-3 text-sm font-medium text-slate-650" aria-label="Product principles">
-              {["No consultancy required", "Clear next actions", "Source-conscious guidance"].map((item) => (
-                <li key={item} className="flex items-center gap-2"><span className="text-forest-700"><CheckIcon /></span>{item}</li>
+              {[
+                "Free and consultancy-independent",
+                "Progress stays on this device",
+                `Information reviewed ${formatDate(SITE_INFORMATION_LAST_REVIEWED)}`,
+              ].map((item) => (
+                <li key={item} className="flex items-center gap-2"><span className="text-forest-700" aria-hidden="true">✓</span>{item}</li>
               ))}
             </ul>
           </div>
 
-          <div className="relative mx-auto w-full max-w-xl lg:mx-0" aria-label="Example roadmap preview">
+          <div className="relative mx-auto w-full max-w-xl lg:mx-0" aria-label="Application control room preview">
             <div aria-hidden="true" className="absolute -inset-5 rotate-2 rounded-[2rem] border border-forest-700/10 bg-white/35" />
             <div className="relative overflow-hidden rounded-[1.5rem] border border-forest-900/15 bg-white shadow-[0_30px_80px_rgba(11,43,38,0.14)]">
               <div className="flex items-center justify-between border-b border-slate-200 px-6 py-5">
-                <div><p className="text-xs font-semibold uppercase tracking-[0.16em] text-forest-700">Your roadmap</p><p className="mt-1 font-semibold text-forest-950">Pre-application planning</p></div>
-                <span className="rounded-full bg-amber-100 px-3 py-1 text-xs font-semibold text-amber-800">Stage 1</span>
+                <div>
+                  <p className="text-xs font-semibold uppercase tracking-[0.16em] text-forest-700">Application control room</p>
+                  <p className="mt-1 font-semibold text-forest-950">Your next best action</p>
+                </div>
+                <span className="rounded-full bg-lime-200 px-3 py-1 text-xs font-semibold text-forest-900">Private</span>
               </div>
               <div className="p-6">
-                <div className="flex items-end justify-between">
-                  <div><p className="text-sm text-slate-500">This week</p><p className="mt-1 text-2xl font-semibold tracking-[-0.035em] text-forest-950">3 priority actions</p></div>
-                  <p className="text-sm font-semibold text-forest-700">Week 01</p>
-                </div>
-                <div className="mt-5 h-2 overflow-hidden rounded-full bg-slate-100"><div className="h-full w-1/3 rounded-full bg-lime-500" /></div>
-                <ol className="mt-6 space-y-3">
-                  {["Confirm target intake and course direction", "List academic documents already available", "Verify application paths on university pages"].map((action, index) => (
-                    <li key={action} className="flex items-center gap-4 rounded-xl border border-slate-200 bg-slate-50/70 p-4">
-                      <span className="grid size-8 shrink-0 place-items-center rounded-full bg-forest-900 text-xs font-semibold text-white">{index + 1}</span>
-                      <span className="text-sm font-medium leading-5 text-slate-700">{action}</span>
-                    </li>
+                <p className="text-sm text-slate-500">Priority for this week</p>
+                <p className="mt-1 text-2xl font-semibold tracking-[-0.035em] text-forest-950">Confirm application routes</p>
+                <p className="mt-3 text-sm leading-6 text-slate-600">Check whether each shortlisted program is direct, uni-assist, or VPD—and record the deadline that applies to your profile.</p>
+                <div className="mt-6 grid gap-3">
+                  {[
+                    ["Research", "3 programs saved", "Complete"],
+                    ["Requirements", "APS and language", "In progress"],
+                    ["Applications", "0 submitted", "Next"],
+                    ["Finance", "Funding gap not set", "Needs input"],
+                  ].map(([label, detail, status], index) => (
+                    <div key={label} className="grid grid-cols-[2rem_1fr_auto] items-center gap-3 rounded-xl border border-slate-200 bg-slate-50/70 p-3.5">
+                      <span className={`grid size-8 place-items-center rounded-full text-xs font-semibold ${index === 0 ? "bg-forest-900 text-white" : "bg-white text-forest-800"}`}>{index + 1}</span>
+                      <div><p className="text-sm font-semibold text-slate-700">{label}</p><p className="text-xs text-slate-500">{detail}</p></div>
+                      <span className="text-[0.68rem] font-semibold uppercase tracking-wide text-forest-700">{status}</span>
+                    </div>
                   ))}
-                </ol>
-                <div className="mt-5 flex items-start gap-3 rounded-xl bg-cream-100 p-4 text-sm leading-6 text-slate-650">
-                  <span aria-hidden="true" className="mt-1 size-2 shrink-0 rounded-full bg-amber-500" />
-                  Requirements can change. Verify every submission detail with the relevant official source.
+                </div>
+                <div className="mt-5 rounded-xl bg-amber-50 p-4 text-sm leading-6 text-amber-900">
+                  ClearPath organizes the work. The university or authority remains the final source.
                 </div>
               </div>
             </div>
@@ -91,37 +122,50 @@ export default function HomePage() {
         </div>
       </section>
 
-      <section id="clarity" className="bg-white py-20 sm:py-24">
+      <section className="bg-white py-20 sm:py-24">
         <div className="mx-auto max-w-7xl px-5 sm:px-8 lg:px-10">
-          <div className="max-w-2xl">
-            <p className="section-kicker">What ClearPath helps with</p>
-            <h2 className="section-title">One place to understand what comes next.</h2>
-            <p className="section-copy">Built for students who need a process they can follow, not another feed of disconnected advice.</p>
+          <div className="max-w-3xl">
+            <p className="section-kicker">Start from where you are</p>
+            <h2 className="section-title">Do not learn the whole system before taking the next step.</h2>
+            <p className="section-copy">Choose your current situation. ClearPath opens the part of the process that can help now.</p>
           </div>
           <div className="mt-12 grid gap-px overflow-hidden rounded-2xl border border-slate-200 bg-slate-200 md:grid-cols-2">
-            {helpAreas.map(([number, title, body]) => (
-              <article key={number} className="group bg-white p-7 transition hover:bg-cream-50 sm:p-9">
-                <div className="flex items-start justify-between gap-6"><span className="font-mono text-xs font-semibold tracking-[0.14em] text-forest-700">{number}</span><span aria-hidden="true" className="mt-1 h-px w-10 bg-slate-300 transition-all group-hover:w-16 group-hover:bg-forest-700" /></div>
-                <h3 className="mt-12 text-xl font-semibold tracking-[-0.025em] text-forest-950">{title}</h3>
-                <p className="mt-3 max-w-lg leading-7 text-slate-600">{body}</p>
+            {START_PATHS.map((path, index) => (
+              <article key={path.stage} className="group flex min-h-72 flex-col bg-white p-7 transition hover:bg-cream-50 sm:p-9">
+                <div className="flex items-center justify-between gap-4">
+                  <span className="font-mono text-xs font-semibold tracking-[0.14em] text-forest-700">0{index + 1}</span>
+                  <span className="text-xs font-semibold uppercase tracking-[0.1em] text-slate-500">{path.stage}</span>
+                </div>
+                <h3 className="mt-10 text-2xl font-semibold tracking-[-0.03em] text-forest-950">{path.title}</h3>
+                <p className="mt-3 max-w-lg leading-7 text-slate-600">{path.body}</p>
+                <Link href={path.href} className="mt-auto pt-7 text-sm font-semibold text-forest-800 underline decoration-lime-500 decoration-2 underline-offset-4">
+                  {path.action} <span aria-hidden="true">→</span>
+                </Link>
               </article>
             ))}
           </div>
         </div>
       </section>
 
-      <section id="how-it-works" className="border-y border-forest-900/10 bg-forest-950 py-20 text-white sm:py-24">
+      <section className="border-y border-white/10 bg-forest-950 py-20 text-white sm:py-24">
         <div className="mx-auto max-w-7xl px-5 sm:px-8 lg:px-10">
           <div className="grid gap-12 lg:grid-cols-[0.72fr_1.28fr] lg:gap-20">
             <div>
-              <p className="section-kicker text-lime-300">Germany roadmap</p>
-              <h2 className="mt-4 text-4xl font-semibold tracking-[-0.045em] sm:text-5xl">A complete process, broken into manageable stages.</h2>
-              <p className="mt-6 max-w-xl text-lg leading-8 text-white/65">Your profile determines where the roadmap starts. Every stage is organized around the question: what should I do next?</p>
+              <p className="section-kicker text-lime-300">One operating system</p>
+              <h2 className="mt-4 text-4xl font-semibold tracking-[-0.045em] sm:text-5xl">From “Where do I apply?” to “What do I do today?”</h2>
+              <p className="mt-6 max-w-xl text-lg leading-8 text-white/65">The product follows decisions and actions, not consultancy sales funnels.</p>
             </div>
             <ol className="divide-y divide-white/12 border-y border-white/12">
-              {roadmapStages.map(([stage, detail], index) => (
+              {[
+                ["Discover", "Find programs and record only decision-relevant facts."],
+                ["Qualify", "Understand documents, language, APS, application route, and financial readiness."],
+                ["Execute", "Follow a staged roadmap, save deadlines, and complete each application checklist."],
+                ["Verify", "Open the exact official source before relying on any changing requirement."],
+              ].map(([stage, detail], index) => (
                 <li key={stage} className="grid gap-4 py-7 sm:grid-cols-[4rem_10rem_1fr] sm:items-start sm:gap-5">
-                  <span className="font-mono text-xs font-semibold tracking-[0.14em] text-lime-300">0{index + 1}</span><h3 className="text-lg font-semibold">{stage}</h3><p className="leading-7 text-white/65">{detail}</p>
+                  <span className="font-mono text-xs font-semibold tracking-[0.14em] text-lime-300">0{index + 1}</span>
+                  <h3 className="text-lg font-semibold">{stage}</h3>
+                  <p className="leading-7 text-white/65">{detail}</p>
                 </li>
               ))}
             </ol>
@@ -130,69 +174,72 @@ export default function HomePage() {
       </section>
 
       <section className="bg-cream-50 py-20 sm:py-24">
-        <div className="mx-auto grid max-w-7xl gap-10 px-5 sm:px-8 lg:grid-cols-2 lg:gap-16 lg:px-10">
-          <article className="rounded-2xl border border-forest-900/10 bg-white p-7 sm:p-10">
-            <p className="section-kicker">Documents and deadlines</p>
-            <h2 className="mt-4 text-3xl font-semibold tracking-[-0.04em] text-forest-950">Know what you need now—and what can wait.</h2>
-            <p className="mt-5 leading-7 text-slate-600">Separate immediate preparation from later-stage documents, highlight dates, and identify questions to confirm before submitting.</p>
-            <div className="mt-8 grid gap-3 sm:grid-cols-2">
-              {["Documents needed now", "Documents needed later", "Deadline visibility", "Questions to ask"].map((item) => (
-                <div key={item} className="flex items-center gap-3 rounded-xl bg-slate-50 px-4 py-3 text-sm font-semibold text-slate-700"><span className="text-forest-700"><CheckIcon /></span>{item}</div>
-              ))}
-            </div>
-          </article>
-          <article className="rounded-2xl border border-forest-900/10 bg-cream-100 p-7 sm:p-10">
-            <p className="section-kicker">Confusing document explainer</p>
-            <h2 className="mt-4 text-3xl font-semibold tracking-[-0.04em] text-forest-950">Turn dense messages into a clear response.</h2>
-            <p className="mt-5 leading-7 text-slate-600">Paste text from a university, APS, uni-assist, or another official process. Get a simple explanation, actions, risk level, and an email draft.</p>
-            <Link href="/explain" className="mt-8 inline-flex items-center gap-2 text-sm font-semibold text-forest-800 underline decoration-lime-500 decoration-2 underline-offset-6 hover:text-forest-600">Explain a document <ArrowIcon /></Link>
-          </article>
-        </div>
-      </section>
-
-      <section className="bg-white py-20 sm:py-24">
         <div className="mx-auto max-w-7xl px-5 sm:px-8 lg:px-10">
-          <div className="rounded-[1.75rem] border border-forest-900/10 bg-forest-50 px-7 py-12 sm:px-12 lg:px-16">
-            <div className="grid gap-10 lg:grid-cols-[1fr_1.1fr] lg:items-center">
-              <div><p className="section-kicker">APS, uni-assist, VPD, visa clarity</p><h2 className="mt-4 text-4xl font-semibold tracking-[-0.045em] text-forest-950">Understand the role of each step before you act.</h2></div>
-              <div>
-                <p className="text-lg leading-8 text-slate-600">ClearPath explains how these terms appear in your process while marking changing requirements that must be checked on official pages.</p>
-                <div className="mt-7 flex flex-wrap gap-2.5">{["APS", "uni-assist", "VPD", "University applications", "Visa preparation"].map((topic) => <span key={topic} className="rounded-full border border-forest-700/20 bg-white px-4 py-2 text-sm font-semibold text-forest-800">{topic}</span>)}</div>
-              </div>
-            </div>
+          <div className="max-w-3xl">
+            <p className="section-kicker">Your working toolkit</p>
+            <h2 className="section-title">Every tool hands work to the next one.</h2>
           </div>
-        </div>
-      </section>
-
-      <section className="border-t border-slate-200 bg-white py-20 sm:py-24">
-        <div className="mx-auto grid max-w-7xl gap-12 px-5 sm:px-8 lg:grid-cols-[0.9fr_1.1fr] lg:items-center lg:gap-20 lg:px-10">
-          <div><p className="section-kicker">Arrival and job path</p><h2 className="section-title">The plan does not stop at university applications.</h2><p className="section-copy">Keep later stages visible without mixing them into today’s priorities. Prepare for arrival and the transition toward a Germany career path when the time is right.</p></div>
-          <div className="grid gap-4 sm:grid-cols-2">
-            {[["Arrival preparation", "Keep accommodation, insurance, travel, and local registration questions organized."], ["Germany job path", "Map language, skills, applications, and career preparation alongside the study plan."]].map(([title, body], index) => (
-              <article key={title} className="min-h-64 rounded-2xl border border-slate-200 bg-cream-50 p-7"><span className="font-mono text-xs font-semibold text-forest-700">0{index + 1}</span><h3 className="mt-16 text-xl font-semibold tracking-[-0.025em] text-forest-950">{title}</h3><p className="mt-3 leading-7 text-slate-600">{body}</p></article>
+          <div className="mt-12 grid gap-4 md:grid-cols-2 lg:grid-cols-3">
+            {TOOLKIT.map(([title, body, href], index) => (
+              <Link key={href} href={href} className="group flex min-h-64 flex-col rounded-2xl border border-forest-900/10 bg-white p-7 transition hover:-translate-y-1 hover:border-forest-700/35 hover:shadow-[0_18px_50px_rgba(11,43,38,0.1)]">
+                <span className="font-mono text-xs font-semibold text-forest-700">0{index + 1}</span>
+                <h3 className="mt-10 text-xl font-semibold tracking-[-0.025em] text-forest-950">{title}</h3>
+                <p className="mt-3 leading-7 text-slate-600">{body}</p>
+                <span className="mt-auto pt-6 text-sm font-semibold text-forest-700">Open tool <span aria-hidden="true">→</span></span>
+              </Link>
             ))}
           </div>
         </div>
       </section>
 
-      <section id="safety" className="bg-amber-50 py-16">
+      <section className="bg-white py-20 sm:py-24">
+        <div className="mx-auto max-w-7xl px-5 sm:px-8 lg:px-10">
+          <div className="grid gap-10 lg:grid-cols-[0.75fr_1.25fr] lg:gap-16">
+            <div>
+              <p className="section-kicker">Current information, scoped carefully</p>
+              <h2 className="section-title">Changing facts are dated, sourced, and never treated as universal.</h2>
+              <p className="section-copy">These are orientation facts. Your applicant category and responsible authority decide what applies.</p>
+            </div>
+            <div className="divide-y divide-slate-200 border-y border-slate-200">
+              {CURRENT_UPDATES.map((fact) => (
+                <article key={fact.id} className="py-7">
+                  <div className="flex flex-wrap items-center justify-between gap-3">
+                    <h3 className="text-lg font-semibold text-forest-950">{fact.title}</h3>
+                    <span className="pill">Checked {formatDate(fact.lastVerified)}</span>
+                  </div>
+                  <p className="mt-3 leading-7 text-slate-600">{fact.summary}</p>
+                  <p className="mt-3 text-sm leading-6 text-amber-800">{fact.caution}</p>
+                  <a href={fact.sourceUrl} target="_blank" rel="noreferrer" className="mt-3 inline-block link-underline text-sm">{fact.sourceLabel} ↗</a>
+                </article>
+              ))}
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <section className="bg-amber-50 py-16">
         <div className="mx-auto grid max-w-7xl gap-7 px-5 sm:px-8 lg:grid-cols-[0.35fr_1.65fr] lg:items-start lg:px-10">
-          <p className="section-kicker text-amber-800">Important disclaimer</p>
-          <div><h2 className="text-2xl font-semibold tracking-[-0.03em] text-forest-950">Clear guidance, without false guarantees.</h2><p className="mt-4 max-w-4xl leading-7 text-slate-700">ClearPath Germany is an educational planning tool, not legal or immigration advice. It does not guarantee eligibility, admission, visa approval, or work authorization. Requirements and deadlines may change; verify critical information with the official university, German mission, APS office, or relevant authority before acting.</p></div>
+          <p className="section-kicker text-amber-800">The trust contract</p>
+          <div>
+            <h2 className="text-2xl font-semibold tracking-[-0.03em] text-forest-950">Useful guidance without false certainty.</h2>
+            <p className="mt-4 max-w-4xl leading-7 text-slate-700">ClearPath Germany is an educational planning tool, not a law firm, immigration adviser, university, or German authority. It does not guarantee eligibility, admission, a visa, or work authorisation. Device-saved progress remains local; remove personal identifiers before using the document explainer.</p>
+          </div>
         </div>
       </section>
 
-      <section className="bg-forest-950 py-18 text-white">
+      <section className="bg-lime-300 py-16 text-forest-950">
         <div className="mx-auto flex max-w-7xl flex-col gap-8 px-5 sm:px-8 lg:flex-row lg:items-center lg:justify-between lg:px-10">
-          <div><p className="text-sm font-semibold uppercase tracking-[0.16em] text-lime-300">Start with your situation</p><h2 className="mt-3 text-3xl font-semibold tracking-[-0.04em] sm:text-4xl">Your next step should not be a guess.</h2></div>
-          <Link className="inline-flex min-h-12 items-center justify-center gap-2 self-start rounded-full bg-lime-300 px-6 text-sm font-semibold text-forest-950 transition hover:bg-lime-200 focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-lime-300 lg:self-auto" href="/roadmap">Build My Germany Roadmap <ArrowIcon /></Link>
+          <div>
+            <p className="text-sm font-semibold uppercase tracking-[0.16em]">Start with your real situation</p>
+            <h2 className="mt-3 text-3xl font-semibold tracking-[-0.04em] sm:text-4xl">Your next step should not be a guess.</h2>
+          </div>
+          <Link className="inline-flex min-h-12 items-center justify-center gap-2 self-start rounded-full bg-forest-950 px-6 text-sm font-semibold text-white transition hover:bg-forest-800 focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-forest-950 lg:self-auto" href="/roadmap">
+            Build my roadmap <span aria-hidden="true">→</span>
+          </Link>
         </div>
       </section>
 
-      <footer className="border-t border-white/10 bg-forest-950 py-8 text-white/55">
-        <div className="mx-auto flex max-w-7xl flex-col gap-3 px-5 text-sm sm:px-8 md:flex-row md:items-center md:justify-between lg:px-10"><p>© 2026 ClearPath Germany</p><p>Built for informed, independent planning.</p></div>
-      </footer>
+      <SiteFooter />
     </main>
   );
 }
-

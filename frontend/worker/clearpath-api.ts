@@ -95,7 +95,7 @@ function roadmapActions(profile: RoadmapProfile, stage: Stage): string[] {
   const actions: string[] = [];
   if (stage === "plan") {
     actions.push(`Shortlist 8-12 ${profile.target_degree} programs in ${profile.field} for the ${profile.target_intake} intake.`, "Confirm each program's application route: direct, uni-assist, or VPD.");
-    if (profile.aps_status === "unsure") actions.push("Check whether your country requires an APS certificate; it can add months.");
+    if (profile.aps_status === "unsure") actions.push("Check whether your qualifications require APS verification; treat it as a potentially long-lead step.");
     if (profile.language_test_status === "not_started") actions.push(`Book a ${profile.study_language === "English" ? "IELTS or TOEFL" : "TestDaF or DSH"} test date; slots fill up early.`);
     actions.push("List the academic documents you already have and note what is missing.", "Map each shortlisted program's deadline into a single calendar.", "Estimate your budget with living costs, semester fees, and the blocked account.");
   } else if (stage === "prepare") {
@@ -113,7 +113,7 @@ function roadmapActions(profile: RoadmapProfile, stage: Stage): string[] {
   } else if (stage === "visa") {
     if (profile.finance_status !== "ready") actions.push("Finalize financial proof; the blocked account confirmation is usually required at the appointment.");
     actions.push("Book the visa appointment immediately; waits can be long.", "Arrange health insurance coverage valid from your arrival date.", "Gather the mission's exact document checklist and follow its order precisely.", "Accept your admission and complete any enrollment steps the university requires now.", "Start looking for accommodation; apply to student dormitories early.");
-  } else actions.push("Book travel and temporary accommodation for your first weeks.", "Prepare original documents in your hand luggage: admission, insurance, financial proof.", "Register your address (Anmeldung) soon after moving in.", "Open a regular bank account and activate blocked account payouts.", "Enroll at the university and get your semester documents.", "Book the residence permit appointment at the Auslaenderbehoerde early.");
+  } else actions.push("Book travel and temporary accommodation for your first weeks.", "Prepare original documents in your hand luggage: admission, insurance, financial proof.", "Register your address (Anmeldung) within the official local window after moving in.", "Open a regular bank account and activate blocked account payouts.", "Enrol at the university and get your semester documents.", "Check the local foreigners authority's residence-permit process early.");
   actions.push("Verify every requirement above on the official page before acting on it.");
   return actions.slice(0, 10);
 }
@@ -143,12 +143,12 @@ const mistakes: Record<Stage, string[]> = {
   arrival: ["Missing the Anmeldung window after moving in.", "Packing original documents in checked luggage.", "Delaying the residence permit appointment."],
 };
 const commonResources = [
-  { label: "DAAD: study programme search", url: "https://www.daad.de/en/studying-in-germany/", last_verified: "2026-07-04" },
-  { label: "Make it in Germany: study guide", url: "https://www.make-it-in-germany.com/en/studying-training/studying", last_verified: "2026-07-04" },
+  { label: "DAAD: study programme search", url: "https://www.daad.de/en/studying-in-germany/", last_verified: "2026-07-11" },
+  { label: "Make it in Germany: study guide", url: "https://www.make-it-in-germany.com/en/study-vocational-training/studies-in-germany", last_verified: "2026-07-11" },
 ];
-const apsResource = { label: "APS: check whether your country requires it", url: "https://www.aps-india.de/", last_verified: "2026-07-04" };
-const assistResource = { label: "uni-assist: application processing and VPD", url: "https://www.uni-assist.de/en/", last_verified: "2026-07-04" };
-const visaResource = { label: "Federal Foreign Office: visa for study", url: "https://www.auswaertiges-amt.de/en/visa-service", last_verified: "2026-07-04" };
+const apsResource = { label: "APS: check whether your qualifications require it", url: "https://www.aps-india.de/", last_verified: "2026-07-11" };
+const assistResource = { label: "uni-assist: deadlines, processing, and VPD", url: "https://www.uni-assist.de/en/how-to-apply/plan-your-application/deadlines-processing-time/", last_verified: "2026-07-11" };
+const visaResource = { label: "Federal Foreign Office: visas for Germany", url: "https://www.auswaertiges-amt.de/en/visa-service/215870-215870", last_verified: "2026-07-11" };
 
 function generateRoadmap(profile: RoadmapProfile): RecordValue {
   const stage = stageFor(profile), [title, summary] = stageMeta[stage], [now, later] = roadmapDocuments(stage, profile);

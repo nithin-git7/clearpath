@@ -10,7 +10,9 @@ import { ApiError } from "@/lib/api";
 import {
   DEFAULT_ROADMAP_REQUEST,
   generateRoadmap,
-  STAGE_LABELS,
+    isRoadmapRequest,
+  isRoadmapResponse,
+STAGE_LABELS,
   type RoadmapRequest,
   type RoadmapResponse,
 } from "@/lib/roadmap";
@@ -56,14 +58,15 @@ export default function RoadmapPage() {
   const [result, setResult] = useState<RoadmapResponse | null>(null);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [copied, setCopied] = useState(false);
 
   useEffect(() => {
-    const draft = readJson<RoadmapRequest>(ROADMAP_DRAFT_STORAGE);
-    const saved = readJson<RoadmapResponse>(ROADMAP_RESULT_STORAGE);
+    const draft = readJson<unknown>(ROADMAP_DRAFT_STORAGE);
+    const saved = readJson<unknown>(ROADMAP_RESULT_STORAGE);
     // Hydrate saved form and last result from localStorage after mount.
     // eslint-disable-next-line react-hooks/set-state-in-effect
-    if (draft) setForm(draft);
-    if (saved) setResult(saved);
+    if (isRoadmapRequest(draft)) setForm(draft);
+    if (isRoadmapResponse(saved)) setResult(saved);
   }, []);
 
   const update = <K extends keyof RoadmapRequest>(key: K, value: RoadmapRequest[K]) => {
@@ -90,6 +93,18 @@ export default function RoadmapPage() {
     }
   };
 
+  const copyRoadmap = async () => {
+    if (!result) return;
+    const text = `${result.stage_title}\n\n${result.stage_summary}\n\nNext actions\n${result.next_actions.map((action, index) => `${index + 1}. ${action}`).join("\n")}\n\nDocuments needed now\n${result.documents_now.map((item) => `- ${item}`).join("\n")}\n\n${result.disclaimer}`;
+    try {
+      await navigator.clipboard.writeText(text);
+      setCopied(true);
+      window.setTimeout(() => setCopied(false), 2000);
+    } catch {
+      setError("Could not copy automatically. Use the print button or select the roadmap text manually.");
+    }
+  };
+
   return (
     <main id="main-content" className="bg-cream-50">
       <section className="border-b border-forest-900/10 bg-white">
@@ -100,7 +115,7 @@ export default function RoadmapPage() {
           </h1>
           <p className="mt-4 max-w-2xl leading-7 text-slate-600">
             Answer a few questions about where you are now. You get a stage, next actions, document
-            timing, weekly focus, and official links to verify.
+            timing, weekly focus, and official links to verify. Your form and latest result stay on this device.
           </p>
         </div>
       </section>
@@ -142,6 +157,7 @@ export default function RoadmapPage() {
               <input
                 id="field"
                 className="field-input"
+                maxLength={120}
                 value={form.field}
                 onChange={(e) => update("field", e.target.value)}
                 placeholder="e.g. Computer Science, Business, Mechanical Engineering"
@@ -243,7 +259,11 @@ export default function RoadmapPage() {
                   <h2 className="mt-3 text-2xl font-semibold tracking-[-0.03em] text-forest-950">{result.stage_title}</h2>
                   <p className="mt-2 leading-7 text-slate-600">{result.stage_summary}</p>
                 </div>
-                <Link href="/explore" className="secondary-button">Find programs</Link>
+                <div className="flex flex-wrap gap-2 print:hidden">
+                  <Link href="/explore" className="secondary-button">Find programs</Link>
+                  <button type="button" onClick={copyRoadmap} className="secondary-button">{copied ? "Copied" : "Copy plan"}</button>
+                  <button type="button" onClick={() => window.print()} className="secondary-button">Print / save PDF</button>
+                </div>
               </div>
             </div>
 
@@ -309,6 +329,14 @@ export default function RoadmapPage() {
               </ul>
               <p className="mt-4 text-xs leading-5 text-slate-500">{result.disclaimer}</p>
             </article>
+            <nav aria-label="Continue your plan" className="surface-card print:hidden">
+              <p className="text-sm font-semibold uppercase tracking-[0.08em] text-forest-700">Continue from this roadmap</p>
+              <div className="mt-4 flex flex-wrap gap-3">
+                <Link href="/deadlines" className="secondary-button">Check deadlines</Link>
+                <Link href="/finance" className="secondary-button">Plan finances</Link>
+                <Link href="/shortlist" className="secondary-button">Open shortlist</Link>
+              </div>
+            </nav>
           </section>
         )}
       </div>

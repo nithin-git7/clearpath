@@ -224,6 +224,25 @@ body {
 
 @media (prefers-reduced-motion: reduce) {
   html {
+@media print {
+  header,
+  footer,
+  .skip-link,
+  .print\:hidden {
+    display: none !important;
+  }
+
+  body,
+  main {
+    background: white !important;
+  }
+
+  .surface-card {
+    break-inside: avoid;
+    box-shadow: none;
+  }
+}
+
     scroll-behavior: auto;
   }
 

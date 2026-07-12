@@ -25,6 +25,16 @@ function buildQuery(params?: Record<string, string | number | undefined>): strin
   return query ? `?${query}` : "";
 }
 
+async function responseErrorMessage(response: Response): Promise<string> {
+  const fallback = `Request failed with status ${response.status}.`;
+  try {
+    const payload = (await response.json()) as { detail?: unknown };
+    return typeof payload.detail === "string" ? payload.detail : fallback;
+  } catch {
+    return fallback;
+  }
+}
+
 export async function apiGet<T>(
   path: string,
   params?: Record<string, string | number | undefined>,
@@ -37,13 +47,13 @@ export async function apiGet<T>(
     });
   } catch {
     throw new ApiError(
-      "Could not reach the ClearPath service. Check that the backend is running.",
+      "The ClearPath service is temporarily unavailable. Please try again in a moment.",
       0,
     );
   }
 
   if (!response.ok) {
-    throw new ApiError(`Request failed with status ${response.status}.`, response.status);
+    throw new ApiError(await responseErrorMessage(response), response.status);
   }
 
   return (await response.json()) as T;
@@ -60,22 +70,13 @@ export async function apiPost<T>(path: string, body: unknown): Promise<T> {
     });
   } catch {
     throw new ApiError(
-      "Could not reach the ClearPath service. Check that the backend is running.",
+      "The ClearPath service is temporarily unavailable. Please try again in a moment.",
       0,
     );
   }
 
   if (!response.ok) {
-    let detail = `Request failed with status ${response.status}.`;
-    try {
-      const payload = (await response.json()) as { detail?: unknown };
-      if (typeof payload.detail === "string") {
-        detail = payload.detail;
-      }
-    } catch {
-      // Keep generic message when the body is not JSON.
-    }
-    throw new ApiError(detail, response.status);
+    throw new ApiError(await responseErrorMessage(response), response.status);
   }
 
   return (await response.json()) as T;

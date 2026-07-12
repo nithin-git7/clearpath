@@ -22,31 +22,31 @@ _COMMON_RESOURCES = [
     RoadmapResource(
         label="DAAD: study programme search",
         url="https://www.daad.de/en/studying-in-germany/",
-        last_verified="2026-07-04",
+        last_verified="2026-07-11",
     ),
     RoadmapResource(
         label="Make it in Germany: study guide",
-        url="https://www.make-it-in-germany.com/en/studying-training/studying",
-        last_verified="2026-07-04",
+        url="https://www.make-it-in-germany.com/en/study-vocational-training/studies-in-germany",
+        last_verified="2026-07-11",
     ),
 ]
 
 _APS_RESOURCE = RoadmapResource(
     label="APS: check whether your country requires it",
     url="https://www.aps-india.de/",
-    last_verified="2026-07-04",
+    last_verified="2026-07-11",
 )
 
 _UNI_ASSIST_RESOURCE = RoadmapResource(
     label="uni-assist: application processing and VPD",
-    url="https://www.uni-assist.de/en/",
-    last_verified="2026-07-04",
+    url="https://www.uni-assist.de/en/how-to-apply/plan-your-application/deadlines-processing-time/",
+    last_verified="2026-07-11",
 )
 
 _VISA_RESOURCE = RoadmapResource(
-    label="Federal Foreign Office: visa for study",
-    url="https://www.auswaertiges-amt.de/en/visa-service",
-    last_verified="2026-07-04",
+    label="Federal Foreign Office: visas for Germany",
+    url="https://www.auswaertiges-amt.de/en/visa-service/215870-215870",
+    last_verified="2026-07-11",
 )
 
 
@@ -99,7 +99,7 @@ def _build_actions(profile: RoadmapRequest, stage: Stage) -> list[str]:
         )
         actions.append("Confirm each program's application route: direct, uni-assist, or VPD.")
         if profile.aps_status == "unsure":
-            actions.append("Check whether your country requires an APS certificate; it can add months.")
+            actions.append("Check whether your qualifications require APS verification; treat it as a potentially long-lead step.")
         if profile.language_test_status == "not_started":
             test = "IELTS or TOEFL" if profile.study_language == "English" else "TestDaF or DSH"
             actions.append(f"Book a {test} test date; slots fill up early.")
@@ -143,10 +143,10 @@ def _build_actions(profile: RoadmapRequest, stage: Stage) -> list[str]:
     if stage == "arrival":
         actions.append("Book travel and temporary accommodation for your first weeks.")
         actions.append("Prepare original documents in your hand luggage: admission, insurance, financial proof.")
-        actions.append("Register your address (Anmeldung) soon after moving in.")
+        actions.append("Register your address (Anmeldung) within the official local window after moving in.")
         actions.append("Open a regular bank account and activate blocked account payouts.")
         actions.append("Enroll at the university and get your semester documents.")
-        actions.append("Book the residence permit appointment at the Auslaenderbehoerde early.")
+        actions.append("Check the local foreigners authority's residence-permit process early.")
 
     actions.append("Verify every requirement above on the official page before acting on it.")
     return actions[:10]

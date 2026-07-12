@@ -99,12 +99,12 @@ export const guides: Guide[] = [
     readingMinutes: 6,
     sections: [
       {
-        heading: "When to start",
-        body: "Begin as soon as you have an admission or a strong shortlist. Appointment availability at German missions varies widely by country and season, so treat early booking as a priority.",
+        heading: "Use the responsible mission and online portal",
+        body: "After admission, follow the German mission responsible for your place of residence. The Federal Foreign Office says national visa applications can be prepared and submitted through the Consular Services Portal, but local document and appointment steps can still differ.",
       },
       {
         heading: "Common building blocks",
-        body: "Most applications ask for admission or an application confirmation, proof of financial resources (often a blocked account), health insurance, a valid passport, and the visa application forms. The exact checklist depends on your local German mission.",
+        body: "A study-visa application normally requires admission, proof of financial resources, health-insurance evidence, a valid passport, and the forms or digital steps specified by the responsible mission. A blocked account is one possible form of financial proof, not the only one.",
       },
       {
         heading: "Verify before you act",
@@ -113,14 +113,14 @@ export const guides: Guide[] = [
     ],
     resources: [
       {
-        label: "Federal Foreign Office: visa for study",
-        url: "https://www.auswaertiges-amt.de/en/visa-service",
-        last_verified: "2026-07-04",
+        label: "Federal Foreign Office: visas for Germany",
+        url: "https://www.auswaertiges-amt.de/en/visa-service/215870-215870",
+        last_verified: "2026-07-11",
       },
       {
         label: "Make it in Germany: student visa",
-        url: "https://www.make-it-in-germany.com/en/studying-training/studying/visa",
-        last_verified: "2026-07-04",
+        url: "https://www.make-it-in-germany.com/en/visa-residence/types/studying",
+        last_verified: "2026-07-11",
       },
     ],
   },
@@ -134,7 +134,7 @@ export const guides: Guide[] = [
     sections: [
       {
         heading: "What it is",
-        body: "The APS (Akademische Prüfstelle) verifies academic documents for applicants from some countries, including India, China, and Vietnam. The process and whether you need it depend entirely on your country of study.",
+        body: "The APS (Akademische Prüfstelle) verifies academic documents for applicants from certain countries. The office, procedure, and whether a certificate is required depend on where your qualifications were earned and the route you are using.",
       },
       {
         heading: "Why it matters",
@@ -168,14 +168,14 @@ export const guides: Guide[] = [
       },
       {
         heading: "VPD",
-        body: "A VPD (Vorpruefungsdokumentation) is a preliminary review of your qualifications, sometimes required by universities that accept direct applications. It states your converted grade and eligibility.",
+        body: "A VPD (Vorprüfungsdokumentation) is issued by uni-assist for a specific university. It documents the certificates reviewed and the German-grade evaluation. You normally submit it yourself to the university before that university's deadline.",
       },
     ],
     resources: [
       {
         label: "uni-assist official site",
-        url: "https://www.uni-assist.de/en/",
-        last_verified: "2026-07-04",
+        url: "https://www.uni-assist.de/en/how-to-apply/plan-your-application/vpd/",
+        last_verified: "2026-07-11",
       },
     ],
   },
@@ -193,14 +193,14 @@ export const guides: Guide[] = [
       },
       {
         heading: "The amount changes",
-        body: "The required minimum is set by the authorities and is updated periodically. Never rely on a figure you saw in an old forum post; confirm the current amount on an official source before opening an account.",
+        body: "For 2026, official study-visa guidance lists at least EUR 11,904 in a blocked account as one way to prove funds. The amount is updated over time, and a scholarship or declaration of commitment may also be accepted. Confirm the amount and method with the German mission handling your case before transferring money.",
       },
     ],
     resources: [
       {
-        label: "Federal Foreign Office: financing your studies",
-        url: "https://www.auswaertiges-amt.de/en/visa-service",
-        last_verified: "2026-07-04",
+        label: "Make it in Germany: student visa finances",
+        url: "https://www.make-it-in-germany.com/en/visa-residence/types/studying",
+        last_verified: "2026-07-11",
       },
     ],
   },
@@ -214,7 +214,7 @@ export const guides: Guide[] = [
     sections: [
       {
         heading: "Mandatory coverage",
-        body: "Health insurance is required to enroll and usually to obtain a visa. Students under a certain age typically qualify for public statutory insurance at student rates, but eligibility rules vary.",
+        body: "Health insurance is mandatory in Germany and proof is commonly needed for enrolment and visa steps. Students are generally in statutory insurance, but exceptions—including some students over 30—mean eligibility must be checked for the individual case.",
       },
       {
         heading: "Confirm eligibility",
@@ -224,8 +224,8 @@ export const guides: Guide[] = [
     resources: [
       {
         label: "Make it in Germany: insurance",
-        url: "https://www.make-it-in-germany.com/en/living-in-germany/insurance",
-        last_verified: "2026-07-04",
+        url: "https://www.make-it-in-germany.com/en/living-in-germany/money-insurance/health-insurance",
+        last_verified: "2026-07-11",
       },
     ],
   },
@@ -264,18 +264,18 @@ export const guides: Guide[] = [
     sections: [
       {
         heading: "Work allowance",
-        body: "International students are generally allowed to work a limited number of days per year. Exceeding the allowance can affect your residence status, so track your working days carefully.",
+        body: "Official guidance states that many students from third countries may work up to 140 full days or 280 half days per year, or up to 20 hours per week. Student-assistant work and individual residence conditions can be treated differently.",
       },
       {
         heading: "Check current rules",
-        body: "Work rules for students can change. Confirm the current allowance and any conditions with the Ausländerbehörde or an official source before taking a job.",
+        body: "Your residence title, study status, and the type of job affect what is allowed. Confirm the conditions on your residence title or with the local foreigners authority before starting work.",
       },
     ],
     resources: [
       {
         label: "Make it in Germany: working as a student",
-        url: "https://www.make-it-in-germany.com/en/studying-training/studying/work",
-        last_verified: "2026-07-04",
+        url: "https://www.make-it-in-germany.com/en/visa-residence/types/studying",
+        last_verified: "2026-07-11",
       },
     ],
   },
@@ -289,18 +289,18 @@ export const guides: Guide[] = [
     sections: [
       {
         heading: "Register your address",
-        body: "Most people must register their address (Anmeldung) at the local registration office within a set window after moving in. You usually need this before opening some services.",
+        body: "Official guidance says you should register your address at the local registration office within two weeks of moving into a residence. Check the local city website for appointments and required documents such as the landlord confirmation.",
       },
       {
         heading: "Residence permit and enrollment",
-        body: "You will typically enroll at your university and apply for a residence permit at the Ausländerbehörde. Book appointments early, as they can be scarce.",
+        body: "Complete enrolment by the deadline in your admission letter. If you need a student residence permit, follow the local foreigners authority's process early because appointments and required documents are managed locally.",
       },
     ],
     resources: [
       {
         label: "Make it in Germany: after arrival",
-        url: "https://www.make-it-in-germany.com/en/living-in-germany",
-        last_verified: "2026-07-04",
+        url: "https://www.make-it-in-germany.com/en/study-vocational-training/studies-in-germany/planning",
+        last_verified: "2026-07-11",
       },
     ],
   },

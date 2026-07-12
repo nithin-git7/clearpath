@@ -8,9 +8,11 @@ The product is an educational planning tool. It is not legal or immigration advi
 
 ## Current status
 
-The scaffold, FastAPI service, responsive frontend, deterministic roadmap, pasted-text explainer, and all-in-one student hub are implemented. The curated catalog currently covers 19 universities and 27 programs, with official links, applicant-specific deadline notes, and verification dates. The India-first application guide, explorer, detail pages, deadline tracker, finance planner, shortlist, comparison, guides, and global search are available. Deterministic golden fixtures now cover roadmap stages, document categories, safety disclaimers, and forbidden promises. The provider-neutral LLM layer, curated rules knowledge base, LLM-backed safety evaluation, feedback, authentication, uploads, payments, database integration, and RAG remain incomplete or deferred.
+ClearPath Germany is now a production-oriented, private-by-default application control room. The responsive frontend includes situation-led onboarding, a unified readiness dashboard, 19 universities and 27 programs, deadline health states, shortlist and comparison tools, an itemized finance planner, personalized roadmap, pasted-text explainer, India-first APS guidance, guides, search, error recovery, and production metadata.
 
-See [PROJECT_PLAN.md](PROJECT_PLAN.md) for the full staged build plan.
+The FastAPI service validates catalog dates and official HTTPS sources, serves deterministic roadmap and explainer workflows, and is covered by regression and safety fixtures. High-risk guidance is dated and source-linked; users are still expected to verify their exact case with the responsible authority. Authentication, uploads, payments, cloud sync, broad scraping, and heavy AI/RAG remain intentionally deferred because they add privacy and maintenance risk without being required for the core planning problem.
+
+See [PRODUCTION_READINESS_PLAN.md](PRODUCTION_READINESS_PLAN.md) for the current product assessment, implemented improvements, release criteria, and delivery record. [PROJECT_PLAN.md](PROJECT_PLAN.md) remains the original staged build plan.
 
 ## MVP scope
 

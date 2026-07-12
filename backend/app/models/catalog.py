@@ -1,13 +1,30 @@
-"""Schemas for the curated university, program, and cost datasets."""
+"""Schemas and integrity validation for curated catalog data."""
 
+from datetime import date
 from typing import Literal
+from urllib.parse import urlparse
 
-from pydantic import BaseModel
+from pydantic import BaseModel, field_validator
 
 DegreeLevel = Literal["bachelor", "master"]
 UniversityType = Literal["public", "private"]
 ApplicationRoute = Literal["uni-assist", "direct", "mixed"]
 Intake = Literal["winter", "summer"]
+
+
+def _date_only(value: str, field_name: str) -> str:
+    try:
+        date.fromisoformat(value)
+    except ValueError as exc:
+        raise ValueError(f"{field_name} must use YYYY-MM-DD format") from exc
+    return value
+
+
+def _official_url(value: str, field_name: str) -> str:
+    parsed = urlparse(value)
+    if parsed.scheme != "https" or not parsed.netloc:
+        raise ValueError(f"{field_name} must be an absolute HTTPS URL")
+    return value
 
 
 class University(BaseModel):
@@ -27,6 +44,16 @@ class University(BaseModel):
     last_verified: str
     source_note: str | None = None
 
+    @field_validator("website", "official_link")
+    @classmethod
+    def validate_urls(cls, value: str, info) -> str:
+        return _official_url(value, info.field_name)
+
+    @field_validator("last_verified")
+    @classmethod
+    def validate_verified_date(cls, value: str) -> str:
+        return _date_only(value, "last_verified")
+
 
 class ProgramDeadline(BaseModel):
     """An application deadline tied to a specific intake."""
@@ -34,6 +61,11 @@ class ProgramDeadline(BaseModel):
     intake: Intake
     deadline: str
     deadline_note: str | None = None
+
+    @field_validator("deadline")
+    @classmethod
+    def validate_deadline(cls, value: str) -> str:
+        return _date_only(value, "deadline")
 
 
 class Program(BaseModel):
@@ -54,6 +86,16 @@ class Program(BaseModel):
     last_verified: str
     source_note: str | None = None
 
+    @field_validator("official_link")
+    @classmethod
+    def validate_official_link(cls, value: str) -> str:
+        return _official_url(value, "official_link")
+
+    @field_validator("last_verified")
+    @classmethod
+    def validate_verified_date(cls, value: str) -> str:
+        return _date_only(value, "last_verified")
+
 
 class DeadlineEntry(BaseModel):
     """A flattened program deadline used by the deadline tracker."""
@@ -70,11 +112,26 @@ class DeadlineEntry(BaseModel):
     deadline_note: str | None = None
     source_note: str | None = None
 
+    @field_validator("deadline", "last_verified")
+    @classmethod
+    def validate_dates(cls, value: str, info) -> str:
+        return _date_only(value, info.field_name)
+
+    @field_validator("official_link")
+    @classmethod
+    def validate_official_link(cls, value: str) -> str:
+        return _official_url(value, "official_link")
+
 
 class CostOfLiving(BaseModel):
-    """A curated monthly cost-of-living estimate for a city."""
+    """A curated monthly planning estimate for a city."""
 
     city: str
     monthly_estimate_eur: int
     notes: str
     last_verified: str
+
+    @field_validator("last_verified")
+    @classmethod
+    def validate_verified_date(cls, value: str) -> str:
+        return _date_only(value, "last_verified")

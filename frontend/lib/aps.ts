@@ -12,25 +12,19 @@ export const APS_COUNTRIES: ApsCountry[] = [
     name: "India",
     code: "IN",
     portal: "https://www.aps-india.de/",
-    last_verified: "2026-07-04",
+    last_verified: "2026-07-11",
   },
   {
     name: "China",
     code: "CN",
     portal: "https://www.aps.org.cn/",
-    last_verified: "2026-07-04",
+    last_verified: "2026-07-11",
   },
   {
     name: "Vietnam",
     code: "VN",
-    portal: "https://www.aps.org.cn/en/vietnam/",
-    last_verified: "2026-07-04",
-  },
-  {
-    name: "Mongolia",
-    code: "MN",
-    portal: "https://www.aps.org.cn/en/mongolia/",
-    last_verified: "2026-07-04",
+    portal: "https://vietnam.diplo.de/vn-de/willkommen/aktuelles/aps-1236800",
+    last_verified: "2026-07-11",
   },
 ];
 

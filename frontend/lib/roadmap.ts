@@ -65,6 +65,48 @@ export const DEFAULT_ROADMAP_REQUEST: RoadmapRequest = {
   visa_status: "not_started",
 };
 
+function isRecord(value: unknown): value is Record<string, unknown> {
+  return Boolean(value) && typeof value === "object" && !Array.isArray(value);
+}
+
+function isStringArray(value: unknown): value is string[] {
+  return Array.isArray(value) && value.every((item) => typeof item === "string");
+}
+
+export function isRoadmapRequest(value: unknown): value is RoadmapRequest {
+  if (!isRecord(value)) return false;
+  return ["highschool", "bachelor_in_progress", "bachelor_done", "master_done"].includes(String(value.education_status)) &&
+    ["bachelor", "master"].includes(String(value.target_degree)) &&
+    typeof value.field === "string" && value.field.length > 0 && value.field.length <= 120 &&
+    ["winter", "summer"].includes(String(value.target_intake)) &&
+    ["required", "not_required", "unsure"].includes(String(value.aps_status)) &&
+    ["English", "German"].includes(String(value.study_language)) &&
+    ["not_started", "preparing", "passed"].includes(String(value.language_test_status)) &&
+    ["researching", "applied", "admitted"].includes(String(value.admission_status)) &&
+    ["not_started", "in_progress", "ready"].includes(String(value.finance_status)) &&
+    ["not_started", "appointment_booked", "approved"].includes(String(value.visa_status));
+}
+
+export function isRoadmapResponse(value: unknown): value is RoadmapResponse {
+  if (!isRecord(value) || !["plan", "prepare", "apply", "visa", "arrival"].includes(String(value.stage))) {
+    return false;
+  }
+  if (typeof value.stage_title !== "string" || typeof value.stage_summary !== "string" || typeof value.disclaimer !== "string") {
+    return false;
+  }
+  if (![value.next_actions, value.documents_now, value.documents_later, value.common_mistakes].every(isStringArray)) {
+    return false;
+  }
+  if (!Array.isArray(value.weekly_plan) || !value.weekly_plan.every(
+    (item) => isRecord(item) && typeof item.week === "number" && typeof item.focus === "string",
+  )) {
+    return false;
+  }
+  return Array.isArray(value.resources) && value.resources.every(
+    (item) => isRecord(item) && typeof item.label === "string" && typeof item.url === "string" && typeof item.last_verified === "string",
+  );
+}
+
 export function generateRoadmap(profile: RoadmapRequest): Promise<RoadmapResponse> {
   return apiPost<RoadmapResponse>("/api/roadmap/generate", profile);
 }

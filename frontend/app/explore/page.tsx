@@ -10,7 +10,9 @@ import SiteFooter from "@/components/SiteFooter";
 import { ApiError } from "@/lib/api";
 import {
   formatDate,
+  deadlineStatusLabel,
   formatEuro,
+  getNextDeadline,
   getPrograms,
   getUniversities,
   type Program,
@@ -35,6 +37,7 @@ function ExploreContent() {
   const [city, setCity] = useState(searchParams.get("city") ?? "");
   const [intake, setIntake] = useState(searchParams.get("intake") ?? "");
   const [freeOnly, setFreeOnly] = useState(searchParams.get("free") === "1");
+  const [sort, setSort] = useState<"relevance" | "deadline" | "tuition">("relevance");
 
   const [programs, setPrograms] = useState<Program[]>([]);
   const [universities, setUniversities] = useState<University[]>([]);
@@ -112,6 +115,18 @@ function ExploreContent() {
     () => new Map(universities.map((university) => [university.id, university])),
     [universities],
   );
+  const sortedPrograms = useMemo(() => {
+    if (sort === "tuition") return [...programs].sort((a, b) => a.tuition_eur - b.tuition_eur);
+    if (sort === "deadline") {
+      return [...programs].sort((a, b) => {
+        const aDeadline = getNextDeadline(a.deadlines)?.deadline ?? "9999-12-31";
+        const bDeadline = getNextDeadline(b.deadlines)?.deadline ?? "9999-12-31";
+        return aDeadline.localeCompare(bDeadline);
+      });
+    }
+    return programs;
+  }, [programs, sort]);
+
 
   const activeFilters = useMemo(
     () => [search, degree, language, field, city, intake, freeOnly ? "free" : ""].filter(Boolean).length,
@@ -226,9 +241,14 @@ function ExploreContent() {
         </aside>
 
         <section aria-live="polite">
-          <p className="mb-4 text-sm font-medium text-slate-600">
-            {loading ? "Loading results..." : `${resultCount} ${view === "programs" ? "programs" : "universities"} found`}
-          </p>
+          <div className="mb-4 flex flex-wrap items-end justify-between gap-3">
+            <p className="text-sm font-medium text-slate-600">
+              {loading ? "Loading results..." : `${resultCount} ${view === "programs" ? "programs" : "universities"} found`}
+            </p>
+            {view === "programs" && (
+              <div className="min-w-48"><label className="field-label" htmlFor="program-sort">Sort programs</label><select id="program-sort" className="field-input" value={sort} onChange={(event) => setSort(event.target.value as typeof sort)}><option value="relevance">Best match</option><option value="deadline">Soonest future deadline</option><option value="tuition">Lowest tuition first</option></select></div>
+            )}
+          </div>
 
           {error && (
             <div className="surface-card border-amber-500/40 bg-amber-50 text-sm text-amber-800">
@@ -259,11 +279,9 @@ function ExploreContent() {
 
           {!error && !loading && view === "programs" && programs.length > 0 && (
             <ul className="grid gap-4">
-              {programs.map((program) => {
+              {sortedPrograms.map((program) => {
                 const university = universitiesById.get(program.university_id);
-                const nextDeadline = program.deadlines
-                  .filter((entry) => new Date(entry.deadline).getTime() >= Date.now())
-                  .sort((a, b) => a.deadline.localeCompare(b.deadline))[0];
+                const nextDeadline = getNextDeadline(program.deadlines);
                 return (
                 <li key={program.id} className="surface-card">
                   <div className="flex flex-wrap items-start justify-between gap-3">
@@ -272,7 +290,7 @@ function ExploreContent() {
                         {program.title}
                       </Link>
                       <p className="mt-1 text-sm text-slate-600">
-                        {university ? `${university.name} - ${university.city}` : program.field}
+                        {university ? `${university.name} · ${university.city}` : program.field}
                       </p>
                     </div>
                     <span className="pill capitalize">{program.degree_level}</span>
@@ -287,7 +305,7 @@ function ExploreContent() {
                   </div>
                   {nextDeadline && (
                     <p className="mt-4 text-sm text-slate-700">
-                      Next deadline: <strong>{formatDate(nextDeadline.deadline)}</strong> for the {nextDeadline.intake} intake
+                      <strong>{deadlineStatusLabel(nextDeadline.deadline)}:</strong> {formatDate(nextDeadline.deadline)} · {nextDeadline.intake} intake
                     </p>
                   )}
                   <div className="mt-5 flex flex-wrap items-center gap-3">

@@ -5,11 +5,11 @@ import { useEffect, useState } from "react";
 
 import SiteFooter from "@/components/SiteFooter";
 import { ApiError } from "@/lib/api";
-import { formatDate, formatEuro, getPrograms, type Program } from "@/lib/catalog";
+import { formatDate, formatEuro, getNextDeadline, getPrograms, type Program } from "@/lib/catalog";
 import { useCompareList } from "@/lib/storage";
 
 export default function ComparePage() {
-  const { items, ready, toggle, has, clear } = useCompareList();
+  const { items, ready, toggle, has, clear, replace } = useCompareList();
   const [programs, setPrograms] = useState<Program[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -20,6 +20,15 @@ export default function ComparePage() {
       .catch((caught) => setError(caught instanceof ApiError ? caught.message : "Could not load programs."))
       .finally(() => setLoading(false));
   }, []);
+
+  useEffect(() => {
+    if (!ready || loading || error) return;
+    const validIds = new Set(programs.map((program) => program.id));
+    const validItems = items.filter((id) => validIds.has(id)).slice(0, 3);
+    if (validItems.length !== items.length || validItems.some((id, index) => id !== items[index])) {
+      replace(validItems);
+    }
+  }, [error, items, loading, programs, ready, replace]);
 
   const selected = programs.filter((p) => items.includes(p.id));
 
@@ -64,7 +73,7 @@ export default function ComparePage() {
                   ["Tuition", (p: Program) => formatEuro(p.tuition_eur)],
                   ["Duration", (p: Program) => `${p.duration_semesters} semesters`],
                   ["Intakes", (p: Program) => p.intakes.join(", ")],
-                  ["Next deadline", (p: Program) => formatDate([...p.deadlines].sort((a, b) => a.deadline.localeCompare(b.deadline))[0]?.deadline ?? "—")],
+                  ["Next deadline", (p: Program) => { const deadline = getNextDeadline(p.deadlines); return deadline ? formatDate(deadline.deadline) : "No upcoming deadline"; }],
                   ["Requirements", (p: Program) => p.requirements_summary],
                 ].map(([label, getter]) => (
                   <tr key={label as string} className="border-b border-slate-100 align-top">

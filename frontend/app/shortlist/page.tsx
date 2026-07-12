@@ -5,7 +5,7 @@ import { useEffect, useState } from "react";
 
 import SiteFooter from "@/components/SiteFooter";
 import { ApiError } from "@/lib/api";
-import { formatDate, formatEuro, getPrograms, type Program } from "@/lib/catalog";
+import { deadlineStatusLabel, formatDate, formatEuro, getNextDeadline, getPrograms, type Program } from "@/lib/catalog";
 import { useChecklist, useShortlist } from "@/lib/storage";
 
 const CHECKLIST_ITEMS = [
@@ -19,6 +19,7 @@ const CHECKLIST_ITEMS = [
 function ApplicationCard({ program, onRemove }: { program: Program; onRemove: () => void }) {
   const itemIds = CHECKLIST_ITEMS.map((item) => item.id);
   const { state, ready, toggle, completedCount, total } = useChecklist(program.id, itemIds);
+  const nextDeadline = getNextDeadline(program.deadlines);
 
   return (
     <li className="surface-card">
@@ -28,6 +29,7 @@ function ApplicationCard({ program, onRemove }: { program: Program; onRemove: ()
             {program.title}
           </Link>
           <p className="mt-1 text-sm text-slate-600 capitalize">{program.degree_level} · {program.language} · {formatEuro(program.tuition_eur)}</p>
+          {ready && completedCount === total && <span className="mt-2 inline-flex rounded-full bg-lime-200 px-2.5 py-1 text-xs font-semibold text-forest-900">Checklist complete · verify before submission</span>}
         </div>
         <button type="button" onClick={onRemove} className="text-xs font-semibold text-slate-500 underline hover:text-forest-700">Remove</button>
       </div>
@@ -55,11 +57,14 @@ function ApplicationCard({ program, onRemove }: { program: Program; onRemove: ()
         </ul>
       </div>
 
-      {program.deadlines.length > 0 && (
-        <p className="mt-4 text-xs text-slate-500">
-          Next deadline: {formatDate([...program.deadlines].sort((a, b) => a.deadline.localeCompare(b.deadline))[0].deadline)}
+      {nextDeadline && (
+        <p className="mt-4 text-xs text-slate-600">
+          <strong>{deadlineStatusLabel(nextDeadline.deadline)}:</strong> {formatDate(nextDeadline.deadline)} · {nextDeadline.intake} intake
         </p>
       )}
+      <div className="mt-4 flex flex-wrap gap-3 text-sm">
+        <Link href={`/explore/program/${program.id}`} className="link-underline">Program details</Link><a href={program.official_link} target="_blank" rel="noreferrer" className="link-underline">Official page ↗</a>
+      </div>
     </li>
   );
 }

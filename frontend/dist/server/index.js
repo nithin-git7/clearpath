@@ -1,4 +1,4 @@
-globalThis.__VINEXT_LAZY_CHUNKS__ = ["assets/CompareButton-BgqrKqr_.js","assets/ShortlistButton-YNGCSpqW.js","assets/VerifiedNote-D75UyN1G.js","assets/api-AliUcbr8.js","assets/catalog-DAwIP29V.js","assets/navigation-CvV01blX.js","assets/storage-gprZeNdP.js","assets/page-DyoXiw7K.js","assets/page-rsThgZ34.js","assets/page-D9r9gLVy.js","assets/page-C8YfphuZ.js","assets/page-FbiMPlYf.js","assets/page-C4mh2sMm.js","assets/page-GlyRfvYG.js","assets/page-CJUwxm-Y.js","assets/page-DThl5Frj.js","assets/page-D1GfO_wq.js","assets/page--2WwHxLu.js","assets/MobileNav-D2KFPk7-.js","assets/layout-segment-context-CJcq5E1C.js","assets/link-Ba5tIsgc.js","assets/router-BO8JzwgZ.js"];
+globalThis.__VINEXT_LAZY_CHUNKS__ = ["assets/CompareButton-CDuZj_0d.js","assets/ShortlistButton-QWbSSZHk.js","assets/SiteFooter-CzYuwluu.js","assets/VerifiedNote-CzuQ1Pla.js","assets/navigation-BFsG5j0d.js","assets/storage-BCxaxhAt.js","assets/page-CpVMlMU7.js","assets/page-DLziS3_8.js","assets/error-BMVQoW5h.js","assets/page-_Vd8cZ9f.js","assets/page-f52EYLFb.js","assets/page-ByiRQ3a4.js","assets/page-CutE5EWg.js","assets/page-B-NWnnoJ.js","assets/page-CtFjA5jW.js","assets/page-DysDMNCS.js","assets/page-T9whQLg1.js","assets/page-CUIPlsLq.js","assets/DesktopNav-lViw_Lge.js","assets/MobileNav-DUg8-OWh.js","assets/layout-segment-context-CMpgU6n0.js","assets/link-PlvxBow2.js","assets/router-DqHAwtg8.js"];
 import * as __viteRscAsyncHooks from "node:async_hooks";
 import { AsyncLocalStorage as AsyncLocalStorage$1 } from "node:async_hooks";
 import assetsManifest from "./__vite_rsc_assets_manifest.js";
@@ -5579,6 +5579,42 @@ function markDynamicUsage() {
 	if (state.headersContext?.forceStatic) return;
 	state.dynamicUsageDetected = true;
 }
+/** Symbol used by cache-runtime.ts to store the "use cache" ALS on globalThis */
+var _USE_CACHE_ALS_KEY = Symbol.for("vinext.cacheRuntime.contextAls");
+/** Symbol used by cache.ts to store the unstable_cache ALS on globalThis */
+var _UNSTABLE_CACHE_ALS_KEY = Symbol.for("vinext.unstableCache.als");
+var _gHeaders = globalThis;
+function _isInsideUseCache() {
+	return _gHeaders[_USE_CACHE_ALS_KEY]?.getStore() != null;
+}
+function _isInsideUnstableCache() {
+	return _gHeaders[_UNSTABLE_CACHE_ALS_KEY]?.getStore() === true;
+}
+/**
+* Throw if the current execution is inside a "use cache" or unstable_cache()
+* scope. Called by dynamic request APIs (headers, cookies, connection) to
+* prevent request-specific data from being frozen into cached results.
+*
+* @param apiName - The name of the API being called (e.g. "connection()")
+*/
+function throwIfInsideCacheScope(apiName) {
+	if (_isInsideUseCache()) {
+		const error = /* @__PURE__ */ new Error(`\`${apiName}\` cannot be called inside "use cache". If you need this data inside a cached function, call \`${apiName}\` outside and pass the required data as an argument.`);
+		try {
+			const ctx = getRequestContext();
+			if (ctx) ctx.invalidDynamicUsageError = error;
+		} catch {}
+		throw error;
+	}
+	if (_isInsideUnstableCache()) {
+		const error = /* @__PURE__ */ new Error(`\`${apiName}\` cannot be called inside a function cached with \`unstable_cache()\`. If you need this data inside a cached function, call \`${apiName}\` outside and pass the required data as an argument.`);
+		try {
+			const ctx = getRequestContext();
+			if (ctx) ctx.invalidDynamicUsageError = error;
+		} catch {}
+		throw error;
+	}
+}
 /**
 * Check, consume, and return any invalid dynamic usage error recorded during
 * the render (e.g. cookies() called inside "use cache"). This error persists
@@ -5690,6 +5726,63 @@ var _HEADERS_MUTATING_METHODS = new Set([
 	"delete",
 	"append"
 ]);
+var ReadonlyHeadersError = class ReadonlyHeadersError extends Error {
+	constructor() {
+		super("Headers cannot be modified. Read more: https://nextjs.org/docs/app/api-reference/functions/headers");
+	}
+	static callable() {
+		throw new ReadonlyHeadersError();
+	}
+};
+function _decorateRequestApiPromise(promise, target) {
+	return new Proxy(promise, {
+		get(promiseTarget, prop) {
+			if (prop in promiseTarget) {
+				const value = Reflect.get(promiseTarget, prop, promiseTarget);
+				return typeof value === "function" ? value.bind(promiseTarget) : value;
+			}
+			const value = Reflect.get(target, prop, target);
+			return typeof value === "function" ? value.bind(target) : value;
+		},
+		has(promiseTarget, prop) {
+			return prop in promiseTarget || prop in target;
+		},
+		ownKeys(promiseTarget) {
+			return Array.from(new Set([...Reflect.ownKeys(promiseTarget), ...Reflect.ownKeys(target)]));
+		},
+		getOwnPropertyDescriptor(promiseTarget, prop) {
+			return Reflect.getOwnPropertyDescriptor(promiseTarget, prop) ?? Reflect.getOwnPropertyDescriptor(target, prop);
+		}
+	});
+}
+var _decoratedHeadersPromises = /* @__PURE__ */ new WeakMap();
+function _getOrCreateDecoratedRequestApiPromise(cache, target) {
+	const cached = cache.get(target);
+	if (cached) return cached;
+	const promise = _decorateRequestApiPromise(Promise.resolve(target), target);
+	cache.set(target, promise);
+	return promise;
+}
+function _decorateRejectedRequestApiPromise(error) {
+	const normalizedError = error instanceof Error ? error : new Error(String(error));
+	const promise = Promise.reject(normalizedError);
+	promise.catch(() => {});
+	return _decorateRequestApiPromise(promise, new Proxy({}, { get(_target, prop) {
+		if (prop === "then" || prop === "catch" || prop === "finally") return;
+		throw normalizedError;
+	} }));
+}
+function _sealHeaders(headers) {
+	return new Proxy(headers, { get(target, prop) {
+		if (typeof prop === "string" && _HEADERS_MUTATING_METHODS.has(prop)) throw new ReadonlyHeadersError();
+		const value = Reflect.get(target, prop, target);
+		return typeof value === "function" ? value.bind(target) : value;
+	} });
+}
+function _getReadonlyHeaders(ctx) {
+	if (!ctx.readonlyHeaders) ctx.readonlyHeaders = _sealHeaders(ctx.headers);
+	return ctx.readonlyHeaders;
+}
 /**
 * Create a HeadersContext from a standard Request object.
 *
@@ -5735,6 +5828,23 @@ function headersContextFromRequest(request) {
 		}
 	};
 }
+/**
+* Read-only Headers instance from the incoming request.
+* Returns a Promise in Next.js 15+ style (but resolves synchronously since
+* the context is already available).
+*/
+function headers$1() {
+	try {
+		throwIfInsideCacheScope("headers()");
+	} catch (error) {
+		return _decorateRejectedRequestApiPromise(error);
+	}
+	const state = _getState$2();
+	if (!state.headersContext) return _decorateRejectedRequestApiPromise(/* @__PURE__ */ new Error("headers() can only be called from a Server Component, Route Handler, or Server Action. Make sure you're not calling it from a Client Component."));
+	if (state.headersContext.accessError) return _decorateRejectedRequestApiPromise(state.headersContext.accessError);
+	markDynamicUsage();
+	return _getOrCreateDecoratedRequestApiPromise(_decoratedHeadersPromises, _getReadonlyHeaders(state.headersContext));
+}
 /** Accumulated Set-Cookie headers from cookies().set() / .delete() calls */
 /**
 * Get and clear all pending Set-Cookie headers generated by cookies().set()/delete().
@@ -5749,7 +5859,7 @@ function getAndClearPendingCookies() {
 var DRAFT_MODE_COOKIE = "__prerender_bypass";
 (/* @__PURE__ */ new Date(0)).toUTCString();
 function getDraftSecret() {
-	return "17b53872-5a11-45d9-ae6a-3025800743e5";
+	return "97cb319d-e1f1-4cc4-93fc-618a0a43c4e5";
 }
 /**
 * Get any Set-Cookie header generated by draftMode().enable()/disable().
@@ -7662,7 +7772,7 @@ var NextURL = class NextURL {
 	* Matches the Next.js API: `request.nextUrl.buildId`.
 	*/
 	get buildId() {
-		return "e6782275-4b54-4b61-a249-2976394d0d7d";
+		return "98a07fb7-3056-4bb6-85f0-572d3b0895d4";
 	}
 };
 var RequestCookies = class {
@@ -12784,7 +12894,7 @@ function buildCacheKey(prefix, pathname, suffix) {
 * The suffix mirrors Next.js's separate on-disk app artifacts while keeping the
 * Cloudflare KV key under its 512-byte limit for long pathnames.
 */
-function appIsrCacheKey(pathname, suffix, buildId = "e6782275-4b54-4b61-a249-2976394d0d7d") {
+function appIsrCacheKey(pathname, suffix, buildId = "98a07fb7-3056-4bb6-85f0-572d3b0895d4") {
 	return buildCacheKey(buildId ? `app:${buildId}` : "app", pathname, suffix);
 }
 function appIsrHtmlKey(pathname) {
@@ -13113,7 +13223,7 @@ function createAppPageArtifactCompatibility(element, routePattern) {
 			routePattern,
 			rootBoundaryId
 		}),
-		deploymentVersion: "e6782275-4b54-4b61-a249-2976394d0d7d",
+		deploymentVersion: "98a07fb7-3056-4bb6-85f0-572d3b0895d4",
 		rootBoundaryId
 	});
 }
@@ -14514,66 +14624,258 @@ var link_default = /* @__PURE__ */ registerClientReference(() => {
 	throw new Error("Unexpectedly client reference export 'default' is called on server");
 }, "c2747888630f", "default");
 //#endregion
+//#region lib/catalog.ts
+var DATE_ONLY_PATTERN = /^(\d{4})-(\d{2})-(\d{2})$/;
+function dateOnlyParts(value) {
+	const match = DATE_ONLY_PATTERN.exec(value);
+	if (!match) return null;
+	const year = Number(match[1]);
+	const month = Number(match[2]);
+	const day = Number(match[3]);
+	const parsed = new Date(year, month - 1, day);
+	return parsed.getFullYear() === year && parsed.getMonth() === month - 1 && parsed.getDate() === day ? [
+		year,
+		month,
+		day
+	] : null;
+}
+function formatDate(value) {
+	const parts = dateOnlyParts(value);
+	const parsed = parts ? new Date(parts[0], parts[1] - 1, parts[2]) : new Date(value);
+	if (Number.isNaN(parsed.getTime())) return value;
+	return parsed.toLocaleDateString("en-GB", {
+		day: "numeric",
+		month: "short",
+		year: "numeric"
+	});
+}
+//#endregion
+//#region lib/official-info-data.ts
+var SITE_INFORMATION_LAST_REVIEWED = "2026-07-11";
+var OFFICIAL_FACTS = {
+	studentFinance: {
+		id: "student-finance-2026",
+		title: "Student visa financial proof",
+		summary: "For 2026, official student-visa guidance lists at least EUR 11,904 in a blocked account as one way to prove funds. A scholarship or declaration of commitment may also be accepted.",
+		appliesTo: "Applicants using the student visa route in 2026",
+		sourceLabel: "Make it in Germany: visa for studying",
+		sourceUrl: "https://www.make-it-in-germany.com/en/visa-residence/types/studying",
+		lastVerified: SITE_INFORMATION_LAST_REVIEWED,
+		caution: "Confirm the amount and accepted proof with the German mission handling your case before transferring money."
+	},
+	studentWork: {
+		id: "student-work-limits",
+		title: "Work while studying",
+		summary: "Official guidance states that many students from third countries may work up to 140 full days or 280 half days per year, or up to 20 hours per week. Student-assistant work can follow different treatment.",
+		appliesTo: "Many third-country students holding a German study residence title",
+		sourceLabel: "Make it in Germany: visa for studying",
+		sourceUrl: "https://www.make-it-in-germany.com/en/visa-residence/types/studying",
+		lastVerified: SITE_INFORMATION_LAST_REVIEWED,
+		caution: "Your residence title, type of job, and study status can change what is allowed. Confirm before starting work."
+	},
+	uniAssistTiming: {
+		id: "uni-assist-processing",
+		title: "uni-assist and VPD timing",
+		summary: "uni-assist recommends applying at least eight weeks before a deadline where possible. A VPD usually takes four to six weeks, but current regional processing times can be longer.",
+		appliesTo: "Applicants whose chosen university uses uni-assist or requires a VPD",
+		sourceLabel: "uni-assist: deadlines and processing time",
+		sourceUrl: "https://www.uni-assist.de/en/how-to-apply/plan-your-application/deadlines-processing-time/",
+		lastVerified: SITE_INFORMATION_LAST_REVIEWED,
+		caution: "For a VPD, you normally must still submit the VPD to the university before its own deadline."
+	},
+	apsIndiaUndergraduate: {
+		id: "aps-india-winter-2026",
+		title: "APS India criteria from winter 2026/27",
+		summary: "APS India states that updated undergraduate criteria apply from winter semester 2026/27, including a minimum 70% overall Class XII score for the described Studienkolleg and one-academic-year pathways.",
+		appliesTo: "Indian undergraduate applicants using the pathways described by APS India",
+		sourceLabel: "APS India: news and updates",
+		sourceUrl: "https://aps-india.de/news/",
+		lastVerified: SITE_INFORMATION_LAST_REVIEWED,
+		caution: "This is not a universal admission guarantee. Universities make admission decisions and may impose additional requirements."
+	},
+	apsIndiaDmat: {
+		id: "aps-india-dmat-2026",
+		title: "dMAT for selected master's applicants",
+		summary: "APS India introduced dMAT for selected applicants whose previous degree is in listed engineering, commerce, finance, economics, business, or management fields, for summer 2027 and later intakes, subject to published transitional exemptions.",
+		appliesTo: "Selected master's applicants from India whose previous degree appears in the official affected-fields list",
+		sourceLabel: "APS India: dMAT",
+		sourceUrl: "https://aps-india.de/dmat/",
+		lastVerified: SITE_INFORMATION_LAST_REVIEWED,
+		caution: "Use the official affected-fields list and transition rules; dMAT does not replace APS verification, anabin, or university admission review."
+	},
+	visaPortal: {
+		id: "consular-services-portal",
+		title: "Online national visa applications",
+		summary: "Germany's Federal Foreign Office says national visa applications can be prepared and submitted through the Consular Services Portal, with all visa sections connected since January 2025.",
+		appliesTo: "Visa categories and locations supported by the portal",
+		sourceLabel: "Federal Foreign Office: visas for Germany",
+		sourceUrl: "https://www.auswaertiges-amt.de/en/visa-service/215870-215870",
+		lastVerified: SITE_INFORMATION_LAST_REVIEWED,
+		caution: "Follow the German mission responsible for your place of residence; local appointment and document steps can differ."
+	},
+	arrivalRegistration: {
+		id: "address-registration",
+		title: "Registering after moving in",
+		summary: "Official guidance says you should register your address with the local registration office within two weeks of moving into a residence in Germany.",
+		appliesTo: "People moving into a registrable residence in Germany",
+		sourceLabel: "Make it in Germany: housing and registration",
+		sourceUrl: "https://www.make-it-in-germany.com/en/living-in-germany/housing-mobility/housing-registration",
+		lastVerified: SITE_INFORMATION_LAST_REVIEWED,
+		caution: "Appointment availability and requested documents are handled locally; check the website of your city or municipality."
+	}
+};
+var TRUSTED_OFFICIAL_RESOURCES = [
+	{
+		label: "DAAD",
+		href: "https://www.daad.de/en/studying-in-germany/"
+	},
+	{
+		label: "uni-assist",
+		href: "https://www.uni-assist.de/en/"
+	},
+	{
+		label: "Make it in Germany",
+		href: "https://www.make-it-in-germany.com/en/"
+	},
+	{
+		label: "Federal Foreign Office",
+		href: "https://www.auswaertiges-amt.de/en/visa-service"
+	}
+];
+//#endregion
+//#region components/SiteFooter.tsx
+var PRODUCT_LINKS = [
+	["Control room", "/hub"],
+	["Explore programs", "/explore"],
+	["Build a roadmap", "/roadmap"],
+	["Track deadlines", "/deadlines"],
+	["Plan finances", "/finance"],
+	["Explain a document", "/explain"]
+];
+function SiteFooter() {
+	return /* @__PURE__ */ (0, import_jsx_runtime_react_server.jsxs)("footer", {
+		className: "border-t border-white/10 bg-forest-950 text-white/70",
+		children: [/* @__PURE__ */ (0, import_jsx_runtime_react_server.jsxs)("div", {
+			className: "mx-auto grid max-w-7xl gap-10 px-5 py-12 sm:px-8 md:grid-cols-[1.2fr_0.8fr_1fr] lg:px-10",
+			children: [
+				/* @__PURE__ */ (0, import_jsx_runtime_react_server.jsxs)("div", { children: [
+					/* @__PURE__ */ (0, import_jsx_runtime_react_server.jsx)("p", {
+						className: "text-base font-semibold text-white",
+						children: "ClearPath Germany"
+					}),
+					/* @__PURE__ */ (0, import_jsx_runtime_react_server.jsx)("p", {
+						className: "mt-3 max-w-sm text-sm leading-6",
+						children: "A private-by-default planning workspace for international students. Know your next step, why it matters, and where to verify it."
+					}),
+					/* @__PURE__ */ (0, import_jsx_runtime_react_server.jsxs)("p", {
+						className: "mt-4 text-xs text-white/50",
+						children: ["Information reviewed ", formatDate(SITE_INFORMATION_LAST_REVIEWED)]
+					})
+				] }),
+				/* @__PURE__ */ (0, import_jsx_runtime_react_server.jsxs)("div", { children: [/* @__PURE__ */ (0, import_jsx_runtime_react_server.jsx)("h2", {
+					className: "text-xs font-semibold uppercase tracking-[0.12em] text-lime-300",
+					children: "Plan"
+				}), /* @__PURE__ */ (0, import_jsx_runtime_react_server.jsx)("ul", {
+					className: "mt-3 space-y-2 text-sm",
+					children: PRODUCT_LINKS.map(([label, href]) => /* @__PURE__ */ (0, import_jsx_runtime_react_server.jsx)("li", { children: /* @__PURE__ */ (0, import_jsx_runtime_react_server.jsx)(link_default, {
+						className: "hover:text-white",
+						href,
+						children: label
+					}) }, href))
+				})] }),
+				/* @__PURE__ */ (0, import_jsx_runtime_react_server.jsxs)("div", { children: [/* @__PURE__ */ (0, import_jsx_runtime_react_server.jsx)("h2", {
+					className: "text-xs font-semibold uppercase tracking-[0.12em] text-lime-300",
+					children: "Verify officially"
+				}), /* @__PURE__ */ (0, import_jsx_runtime_react_server.jsx)("ul", {
+					className: "mt-3 space-y-2 text-sm",
+					children: TRUSTED_OFFICIAL_RESOURCES.map((resource) => /* @__PURE__ */ (0, import_jsx_runtime_react_server.jsx)("li", { children: /* @__PURE__ */ (0, import_jsx_runtime_react_server.jsxs)("a", {
+						className: "hover:text-white",
+						href: resource.href,
+						target: "_blank",
+						rel: "noreferrer",
+						children: [resource.label, " ↗"]
+					}) }, resource.href))
+				})] })
+			]
+		}), /* @__PURE__ */ (0, import_jsx_runtime_react_server.jsx)("div", {
+			className: "border-t border-white/10",
+			children: /* @__PURE__ */ (0, import_jsx_runtime_react_server.jsxs)("div", {
+				className: "mx-auto flex max-w-7xl flex-col gap-2 px-5 py-6 text-xs text-white/50 sm:px-8 md:flex-row md:items-center md:justify-between lg:px-10",
+				children: [/* @__PURE__ */ (0, import_jsx_runtime_react_server.jsx)("p", { children: "© 2026 ClearPath Germany. Progress stays on this device unless a tool submits text for analysis." }), /* @__PURE__ */ (0, import_jsx_runtime_react_server.jsx)("p", { children: "Educational planning only. No admission, visa, or work-authorisation guarantees." })]
+			})
+		})]
+	});
+}
+//#endregion
 //#region app/page.tsx
 var page_exports$13 = /* @__PURE__ */ __exportAll({ default: () => HomePage });
-var helpAreas = [
+var START_PATHS = [
+	{
+		stage: "I am still exploring",
+		title: "Find realistic programs",
+		body: "Search by degree, subject, language, city, intake, and tuition. Compare the facts that change a decision.",
+		href: "/explore",
+		action: "Explore programs"
+	},
+	{
+		stage: "I am preparing applications",
+		title: "Build my exact sequence",
+		body: "Turn education, APS, language, intake, and finance status into a staged action plan.",
+		href: "/roadmap",
+		action: "Build my roadmap"
+	},
+	{
+		stage: "I have an offer or official email",
+		title: "Understand what it asks",
+		body: "Extract the meaning, dates, amounts, risk level, next actions, and a safe reply draft.",
+		href: "/explain",
+		action: "Explain a message"
+	},
+	{
+		stage: "I am preparing to move",
+		title: "Plan money and arrival",
+		body: "See a complete budget, financial-proof reference, and the steps that follow admission.",
+		href: "/finance",
+		action: "Plan my finances"
+	}
+];
+var TOOLKIT = [
 	[
-		"01",
-		"A roadmap built around you",
-		"Turn your education, target intake, language status, budget, and goal into a clear sequence of stages."
+		"Program explorer",
+		"Build a source-backed shortlist instead of collecting random browser tabs.",
+		"/explore"
 	],
 	[
-		"02",
-		"Documents and deadlines",
-		"Separate what you need now from what comes later, then keep important dates and missing items visible."
+		"Decision comparison",
+		"Compare up to three programs across requirements, costs, intake, and deadline.",
+		"/compare"
 	],
 	[
-		"03",
-		"Application path clarity",
-		"Understand whether a university mentions direct application, uni-assist, or a VPD before you act."
+		"Deadline intelligence",
+		"Separate future, near, and passed cycles—and always verify your applicant category.",
+		"/deadlines"
 	],
 	[
-		"04",
-		"Plain-language explanations",
-		"Turn confusing official text into a simple meaning, questions, and concrete next actions."
+		"Application workspace",
+		"Save programs and complete a separate checklist for every application.",
+		"/shortlist"
+	],
+	[
+		"Finance readiness",
+		"Calculate monthly costs, setup costs, runway, and the funding gap.",
+		"/finance"
+	],
+	[
+		"Official-language decoder",
+		"Turn dense university, APS, visa, or insurance text into concrete actions.",
+		"/explain"
 	]
 ];
-var roadmapStages = [
-	["Plan", "Set your goal, target intake, field, and realistic preparation window."],
-	["Prepare", "Organize tests, academic documents, APS context, and application requirements."],
-	["Apply", "Track application paths, deadlines, submissions, and questions that need confirmation."],
-	["Move forward", "Prepare for visa, arrival, and the transition from study planning to a Germany job path."]
+var CURRENT_UPDATES = [
+	OFFICIAL_FACTS.studentFinance,
+	OFFICIAL_FACTS.uniAssistTiming,
+	OFFICIAL_FACTS.apsIndiaDmat
 ];
-function ArrowIcon() {
-	return /* @__PURE__ */ (0, import_jsx_runtime_react_server.jsx)("svg", {
-		"aria-hidden": "true",
-		className: "size-4",
-		viewBox: "0 0 16 16",
-		fill: "none",
-		children: /* @__PURE__ */ (0, import_jsx_runtime_react_server.jsx)("path", {
-			d: "M3 8h9M8.5 4.5 12 8l-3.5 3.5",
-			stroke: "currentColor",
-			strokeWidth: "1.6",
-			strokeLinecap: "round",
-			strokeLinejoin: "round"
-		})
-	});
-}
-function CheckIcon() {
-	return /* @__PURE__ */ (0, import_jsx_runtime_react_server.jsx)("svg", {
-		"aria-hidden": "true",
-		className: "size-4",
-		viewBox: "0 0 16 16",
-		fill: "none",
-		children: /* @__PURE__ */ (0, import_jsx_runtime_react_server.jsx)("path", {
-			d: "m3.5 8.2 2.8 2.8 6.2-6.2",
-			stroke: "currentColor",
-			strokeWidth: "1.8",
-			strokeLinecap: "round",
-			strokeLinejoin: "round"
-		})
-	});
-}
 function HomePage() {
 	return /* @__PURE__ */ (0, import_jsx_runtime_react_server.jsxs)("main", {
 		id: "main-content",
@@ -14593,47 +14895,51 @@ function HomePage() {
 						className: "relative mx-auto grid max-w-7xl gap-14 px-5 py-18 sm:px-8 sm:py-24 lg:grid-cols-[1.08fr_0.92fr] lg:items-center lg:gap-20 lg:px-10 lg:py-28",
 						children: [/* @__PURE__ */ (0, import_jsx_runtime_react_server.jsxs)("div", { children: [
 							/* @__PURE__ */ (0, import_jsx_runtime_react_server.jsxs)("p", {
-								className: "mb-6 inline-flex items-center gap-2 rounded-full border border-forest-700/20 bg-white/70 px-3 py-1.5 text-xs font-semibold uppercase tracking-[0.17em] text-forest-700",
-								children: [/* @__PURE__ */ (0, import_jsx_runtime_react_server.jsx)("span", { className: "size-1.5 rounded-full bg-lime-500" }), "Independent planning. Official verification."]
+								className: "mb-6 inline-flex items-center gap-2 rounded-full border border-forest-700/20 bg-white/75 px-3 py-1.5 text-xs font-semibold uppercase tracking-[0.17em] text-forest-700",
+								children: [/* @__PURE__ */ (0, import_jsx_runtime_react_server.jsx)("span", { className: "size-1.5 rounded-full bg-lime-500" }), "Independent planning · official verification"]
 							}),
 							/* @__PURE__ */ (0, import_jsx_runtime_react_server.jsx)("h1", {
 								className: "max-w-3xl text-balance text-5xl font-semibold leading-[1.02] tracking-[-0.055em] text-forest-950 sm:text-6xl lg:text-[4.6rem]",
-								children: "Apply to Germany without feeling lost."
+								children: "Germany applications are messy. Your plan should not be."
 							}),
 							/* @__PURE__ */ (0, import_jsx_runtime_react_server.jsx)("p", {
 								className: "mt-7 max-w-2xl text-pretty text-lg leading-8 text-slate-650 sm:text-xl",
-								children: "ClearPath Germany helps students build a step-by-step Germany study and career roadmap, understand documents, track next actions, and avoid confusion."
+								children: "ClearPath turns programs, APS, uni-assist, documents, deadlines, finances, visa preparation, and arrival into one personal control room—with the official source beside every critical fact."
 							}),
 							/* @__PURE__ */ (0, import_jsx_runtime_react_server.jsxs)("div", {
 								className: "mt-9 flex flex-col gap-3 sm:flex-row",
 								children: [/* @__PURE__ */ (0, import_jsx_runtime_react_server.jsxs)(link_default, {
 									className: "primary-button",
 									href: "/roadmap",
-									children: ["Build My Germany Roadmap ", /* @__PURE__ */ (0, import_jsx_runtime_react_server.jsx)(ArrowIcon, {})]
+									children: ["Build my Germany roadmap ", /* @__PURE__ */ (0, import_jsx_runtime_react_server.jsx)("span", {
+										"aria-hidden": "true",
+										children: "→"
+									})]
 								}), /* @__PURE__ */ (0, import_jsx_runtime_react_server.jsx)(link_default, {
 									className: "secondary-button",
-									href: "/explain",
-									children: "Explain A Confusing Document"
+									href: "/hub",
+									children: "Open my control room"
 								})]
 							}),
 							/* @__PURE__ */ (0, import_jsx_runtime_react_server.jsx)("ul", {
 								className: "mt-8 flex flex-wrap gap-x-6 gap-y-3 text-sm font-medium text-slate-650",
 								"aria-label": "Product principles",
 								children: [
-									"No consultancy required",
-									"Clear next actions",
-									"Source-conscious guidance"
+									"Free and consultancy-independent",
+									"Progress stays on this device",
+									`Information reviewed ${formatDate(SITE_INFORMATION_LAST_REVIEWED)}`
 								].map((item) => /* @__PURE__ */ (0, import_jsx_runtime_react_server.jsxs)("li", {
 									className: "flex items-center gap-2",
 									children: [/* @__PURE__ */ (0, import_jsx_runtime_react_server.jsx)("span", {
 										className: "text-forest-700",
-										children: /* @__PURE__ */ (0, import_jsx_runtime_react_server.jsx)(CheckIcon, {})
+										"aria-hidden": "true",
+										children: "✓"
 									}), item]
 								}, item))
 							})
 						] }), /* @__PURE__ */ (0, import_jsx_runtime_react_server.jsxs)("div", {
 							className: "relative mx-auto w-full max-w-xl lg:mx-0",
-							"aria-label": "Example roadmap preview",
+							"aria-label": "Application control room preview",
 							children: [/* @__PURE__ */ (0, import_jsx_runtime_react_server.jsx)("div", {
 								"aria-hidden": "true",
 								className: "absolute -inset-5 rotate-2 rounded-[2rem] border border-forest-700/10 bg-white/35"
@@ -14643,57 +14949,76 @@ function HomePage() {
 									className: "flex items-center justify-between border-b border-slate-200 px-6 py-5",
 									children: [/* @__PURE__ */ (0, import_jsx_runtime_react_server.jsxs)("div", { children: [/* @__PURE__ */ (0, import_jsx_runtime_react_server.jsx)("p", {
 										className: "text-xs font-semibold uppercase tracking-[0.16em] text-forest-700",
-										children: "Your roadmap"
+										children: "Application control room"
 									}), /* @__PURE__ */ (0, import_jsx_runtime_react_server.jsx)("p", {
 										className: "mt-1 font-semibold text-forest-950",
-										children: "Pre-application planning"
+										children: "Your next best action"
 									})] }), /* @__PURE__ */ (0, import_jsx_runtime_react_server.jsx)("span", {
-										className: "rounded-full bg-amber-100 px-3 py-1 text-xs font-semibold text-amber-800",
-										children: "Stage 1"
+										className: "rounded-full bg-lime-200 px-3 py-1 text-xs font-semibold text-forest-900",
+										children: "Private"
 									})]
 								}), /* @__PURE__ */ (0, import_jsx_runtime_react_server.jsxs)("div", {
 									className: "p-6",
 									children: [
-										/* @__PURE__ */ (0, import_jsx_runtime_react_server.jsxs)("div", {
-											className: "flex items-end justify-between",
-											children: [/* @__PURE__ */ (0, import_jsx_runtime_react_server.jsxs)("div", { children: [/* @__PURE__ */ (0, import_jsx_runtime_react_server.jsx)("p", {
-												className: "text-sm text-slate-500",
-												children: "This week"
-											}), /* @__PURE__ */ (0, import_jsx_runtime_react_server.jsx)("p", {
-												className: "mt-1 text-2xl font-semibold tracking-[-0.035em] text-forest-950",
-												children: "3 priority actions"
-											})] }), /* @__PURE__ */ (0, import_jsx_runtime_react_server.jsx)("p", {
-												className: "text-sm font-semibold text-forest-700",
-												children: "Week 01"
-											})]
+										/* @__PURE__ */ (0, import_jsx_runtime_react_server.jsx)("p", {
+											className: "text-sm text-slate-500",
+											children: "Priority for this week"
+										}),
+										/* @__PURE__ */ (0, import_jsx_runtime_react_server.jsx)("p", {
+											className: "mt-1 text-2xl font-semibold tracking-[-0.035em] text-forest-950",
+											children: "Confirm application routes"
+										}),
+										/* @__PURE__ */ (0, import_jsx_runtime_react_server.jsx)("p", {
+											className: "mt-3 text-sm leading-6 text-slate-600",
+											children: "Check whether each shortlisted program is direct, uni-assist, or VPD—and record the deadline that applies to your profile."
 										}),
 										/* @__PURE__ */ (0, import_jsx_runtime_react_server.jsx)("div", {
-											className: "mt-5 h-2 overflow-hidden rounded-full bg-slate-100",
-											children: /* @__PURE__ */ (0, import_jsx_runtime_react_server.jsx)("div", { className: "h-full w-1/3 rounded-full bg-lime-500" })
-										}),
-										/* @__PURE__ */ (0, import_jsx_runtime_react_server.jsx)("ol", {
-											className: "mt-6 space-y-3",
+											className: "mt-6 grid gap-3",
 											children: [
-												"Confirm target intake and course direction",
-												"List academic documents already available",
-												"Verify application paths on university pages"
-											].map((action, index) => /* @__PURE__ */ (0, import_jsx_runtime_react_server.jsxs)("li", {
-												className: "flex items-center gap-4 rounded-xl border border-slate-200 bg-slate-50/70 p-4",
-												children: [/* @__PURE__ */ (0, import_jsx_runtime_react_server.jsx)("span", {
-													className: "grid size-8 shrink-0 place-items-center rounded-full bg-forest-900 text-xs font-semibold text-white",
-													children: index + 1
-												}), /* @__PURE__ */ (0, import_jsx_runtime_react_server.jsx)("span", {
-													className: "text-sm font-medium leading-5 text-slate-700",
-													children: action
-												})]
-											}, action))
+												[
+													"Research",
+													"3 programs saved",
+													"Complete"
+												],
+												[
+													"Requirements",
+													"APS and language",
+													"In progress"
+												],
+												[
+													"Applications",
+													"0 submitted",
+													"Next"
+												],
+												[
+													"Finance",
+													"Funding gap not set",
+													"Needs input"
+												]
+											].map(([label, detail, status], index) => /* @__PURE__ */ (0, import_jsx_runtime_react_server.jsxs)("div", {
+												className: "grid grid-cols-[2rem_1fr_auto] items-center gap-3 rounded-xl border border-slate-200 bg-slate-50/70 p-3.5",
+												children: [
+													/* @__PURE__ */ (0, import_jsx_runtime_react_server.jsx)("span", {
+														className: `grid size-8 place-items-center rounded-full text-xs font-semibold ${index === 0 ? "bg-forest-900 text-white" : "bg-white text-forest-800"}`,
+														children: index + 1
+													}),
+													/* @__PURE__ */ (0, import_jsx_runtime_react_server.jsxs)("div", { children: [/* @__PURE__ */ (0, import_jsx_runtime_react_server.jsx)("p", {
+														className: "text-sm font-semibold text-slate-700",
+														children: label
+													}), /* @__PURE__ */ (0, import_jsx_runtime_react_server.jsx)("p", {
+														className: "text-xs text-slate-500",
+														children: detail
+													})] }),
+													/* @__PURE__ */ (0, import_jsx_runtime_react_server.jsx)("span", {
+														className: "text-[0.68rem] font-semibold uppercase tracking-wide text-forest-700",
+														children: status
+													})
+												]
+											}, label))
 										}),
-										/* @__PURE__ */ (0, import_jsx_runtime_react_server.jsxs)("div", {
-											className: "mt-5 flex items-start gap-3 rounded-xl bg-cream-100 p-4 text-sm leading-6 text-slate-650",
-											children: [/* @__PURE__ */ (0, import_jsx_runtime_react_server.jsx)("span", {
-												"aria-hidden": "true",
-												className: "mt-1 size-2 shrink-0 rounded-full bg-amber-500"
-											}), "Requirements can change. Verify every submission detail with the relevant official source."]
+										/* @__PURE__ */ (0, import_jsx_runtime_react_server.jsx)("div", {
+											className: "mt-5 rounded-xl bg-amber-50 p-4 text-sm leading-6 text-amber-900",
+											children: "ClearPath organizes the work. The university or authority remains the final source."
 										})
 									]
 								})]
@@ -14703,57 +15028,67 @@ function HomePage() {
 				]
 			}),
 			/* @__PURE__ */ (0, import_jsx_runtime_react_server.jsx)("section", {
-				id: "clarity",
 				className: "bg-white py-20 sm:py-24",
 				children: /* @__PURE__ */ (0, import_jsx_runtime_react_server.jsxs)("div", {
 					className: "mx-auto max-w-7xl px-5 sm:px-8 lg:px-10",
 					children: [/* @__PURE__ */ (0, import_jsx_runtime_react_server.jsxs)("div", {
-						className: "max-w-2xl",
+						className: "max-w-3xl",
 						children: [
 							/* @__PURE__ */ (0, import_jsx_runtime_react_server.jsx)("p", {
 								className: "section-kicker",
-								children: "What ClearPath helps with"
+								children: "Start from where you are"
 							}),
 							/* @__PURE__ */ (0, import_jsx_runtime_react_server.jsx)("h2", {
 								className: "section-title",
-								children: "One place to understand what comes next."
+								children: "Do not learn the whole system before taking the next step."
 							}),
 							/* @__PURE__ */ (0, import_jsx_runtime_react_server.jsx)("p", {
 								className: "section-copy",
-								children: "Built for students who need a process they can follow, not another feed of disconnected advice."
+								children: "Choose your current situation. ClearPath opens the part of the process that can help now."
 							})
 						]
 					}), /* @__PURE__ */ (0, import_jsx_runtime_react_server.jsx)("div", {
 						className: "mt-12 grid gap-px overflow-hidden rounded-2xl border border-slate-200 bg-slate-200 md:grid-cols-2",
-						children: helpAreas.map(([number, title, body]) => /* @__PURE__ */ (0, import_jsx_runtime_react_server.jsxs)("article", {
-							className: "group bg-white p-7 transition hover:bg-cream-50 sm:p-9",
+						children: START_PATHS.map((path, index) => /* @__PURE__ */ (0, import_jsx_runtime_react_server.jsxs)("article", {
+							className: "group flex min-h-72 flex-col bg-white p-7 transition hover:bg-cream-50 sm:p-9",
 							children: [
 								/* @__PURE__ */ (0, import_jsx_runtime_react_server.jsxs)("div", {
-									className: "flex items-start justify-between gap-6",
-									children: [/* @__PURE__ */ (0, import_jsx_runtime_react_server.jsx)("span", {
+									className: "flex items-center justify-between gap-4",
+									children: [/* @__PURE__ */ (0, import_jsx_runtime_react_server.jsxs)("span", {
 										className: "font-mono text-xs font-semibold tracking-[0.14em] text-forest-700",
-										children: number
+										children: ["0", index + 1]
 									}), /* @__PURE__ */ (0, import_jsx_runtime_react_server.jsx)("span", {
-										"aria-hidden": "true",
-										className: "mt-1 h-px w-10 bg-slate-300 transition-all group-hover:w-16 group-hover:bg-forest-700"
+										className: "text-xs font-semibold uppercase tracking-[0.1em] text-slate-500",
+										children: path.stage
 									})]
 								}),
 								/* @__PURE__ */ (0, import_jsx_runtime_react_server.jsx)("h3", {
-									className: "mt-12 text-xl font-semibold tracking-[-0.025em] text-forest-950",
-									children: title
+									className: "mt-10 text-2xl font-semibold tracking-[-0.03em] text-forest-950",
+									children: path.title
 								}),
 								/* @__PURE__ */ (0, import_jsx_runtime_react_server.jsx)("p", {
 									className: "mt-3 max-w-lg leading-7 text-slate-600",
-									children: body
+									children: path.body
+								}),
+								/* @__PURE__ */ (0, import_jsx_runtime_react_server.jsxs)(link_default, {
+									href: path.href,
+									className: "mt-auto pt-7 text-sm font-semibold text-forest-800 underline decoration-lime-500 decoration-2 underline-offset-4",
+									children: [
+										path.action,
+										" ",
+										/* @__PURE__ */ (0, import_jsx_runtime_react_server.jsx)("span", {
+											"aria-hidden": "true",
+											children: "→"
+										})
+									]
 								})
 							]
-						}, number))
+						}, path.stage))
 					})]
 				})
 			}),
 			/* @__PURE__ */ (0, import_jsx_runtime_react_server.jsx)("section", {
-				id: "how-it-works",
-				className: "border-y border-forest-900/10 bg-forest-950 py-20 text-white sm:py-24",
+				className: "border-y border-white/10 bg-forest-950 py-20 text-white sm:py-24",
 				children: /* @__PURE__ */ (0, import_jsx_runtime_react_server.jsx)("div", {
 					className: "mx-auto max-w-7xl px-5 sm:px-8 lg:px-10",
 					children: /* @__PURE__ */ (0, import_jsx_runtime_react_server.jsxs)("div", {
@@ -14761,19 +15096,24 @@ function HomePage() {
 						children: [/* @__PURE__ */ (0, import_jsx_runtime_react_server.jsxs)("div", { children: [
 							/* @__PURE__ */ (0, import_jsx_runtime_react_server.jsx)("p", {
 								className: "section-kicker text-lime-300",
-								children: "Germany roadmap"
+								children: "One operating system"
 							}),
 							/* @__PURE__ */ (0, import_jsx_runtime_react_server.jsx)("h2", {
 								className: "mt-4 text-4xl font-semibold tracking-[-0.045em] sm:text-5xl",
-								children: "A complete process, broken into manageable stages."
+								children: "From “Where do I apply?” to “What do I do today?”"
 							}),
 							/* @__PURE__ */ (0, import_jsx_runtime_react_server.jsx)("p", {
 								className: "mt-6 max-w-xl text-lg leading-8 text-white/65",
-								children: "Your profile determines where the roadmap starts. Every stage is organized around the question: what should I do next?"
+								children: "The product follows decisions and actions, not consultancy sales funnels."
 							})
 						] }), /* @__PURE__ */ (0, import_jsx_runtime_react_server.jsx)("ol", {
 							className: "divide-y divide-white/12 border-y border-white/12",
-							children: roadmapStages.map(([stage, detail], index) => /* @__PURE__ */ (0, import_jsx_runtime_react_server.jsxs)("li", {
+							children: [
+								["Discover", "Find programs and record only decision-relevant facts."],
+								["Qualify", "Understand documents, language, APS, application route, and financial readiness."],
+								["Execute", "Follow a staged roadmap, save deadlines, and complete each application checklist."],
+								["Verify", "Open the exact official source before relying on any changing requirement."]
+							].map(([stage, detail], index) => /* @__PURE__ */ (0, import_jsx_runtime_react_server.jsxs)("li", {
 								className: "grid gap-4 py-7 sm:grid-cols-[4rem_10rem_1fr] sm:items-start sm:gap-5",
 								children: [
 									/* @__PURE__ */ (0, import_jsx_runtime_react_server.jsxs)("span", {
@@ -14797,59 +15137,43 @@ function HomePage() {
 			/* @__PURE__ */ (0, import_jsx_runtime_react_server.jsx)("section", {
 				className: "bg-cream-50 py-20 sm:py-24",
 				children: /* @__PURE__ */ (0, import_jsx_runtime_react_server.jsxs)("div", {
-					className: "mx-auto grid max-w-7xl gap-10 px-5 sm:px-8 lg:grid-cols-2 lg:gap-16 lg:px-10",
-					children: [/* @__PURE__ */ (0, import_jsx_runtime_react_server.jsxs)("article", {
-						className: "rounded-2xl border border-forest-900/10 bg-white p-7 sm:p-10",
-						children: [
-							/* @__PURE__ */ (0, import_jsx_runtime_react_server.jsx)("p", {
-								className: "section-kicker",
-								children: "Documents and deadlines"
-							}),
-							/* @__PURE__ */ (0, import_jsx_runtime_react_server.jsx)("h2", {
-								className: "mt-4 text-3xl font-semibold tracking-[-0.04em] text-forest-950",
-								children: "Know what you need now—and what can wait."
-							}),
-							/* @__PURE__ */ (0, import_jsx_runtime_react_server.jsx)("p", {
-								className: "mt-5 leading-7 text-slate-600",
-								children: "Separate immediate preparation from later-stage documents, highlight dates, and identify questions to confirm before submitting."
-							}),
-							/* @__PURE__ */ (0, import_jsx_runtime_react_server.jsx)("div", {
-								className: "mt-8 grid gap-3 sm:grid-cols-2",
-								children: [
-									"Documents needed now",
-									"Documents needed later",
-									"Deadline visibility",
-									"Questions to ask"
-								].map((item) => /* @__PURE__ */ (0, import_jsx_runtime_react_server.jsxs)("div", {
-									className: "flex items-center gap-3 rounded-xl bg-slate-50 px-4 py-3 text-sm font-semibold text-slate-700",
-									children: [/* @__PURE__ */ (0, import_jsx_runtime_react_server.jsx)("span", {
-										className: "text-forest-700",
-										children: /* @__PURE__ */ (0, import_jsx_runtime_react_server.jsx)(CheckIcon, {})
-									}), item]
-								}, item))
-							})
-						]
-					}), /* @__PURE__ */ (0, import_jsx_runtime_react_server.jsxs)("article", {
-						className: "rounded-2xl border border-forest-900/10 bg-cream-100 p-7 sm:p-10",
-						children: [
-							/* @__PURE__ */ (0, import_jsx_runtime_react_server.jsx)("p", {
-								className: "section-kicker",
-								children: "Confusing document explainer"
-							}),
-							/* @__PURE__ */ (0, import_jsx_runtime_react_server.jsx)("h2", {
-								className: "mt-4 text-3xl font-semibold tracking-[-0.04em] text-forest-950",
-								children: "Turn dense messages into a clear response."
-							}),
-							/* @__PURE__ */ (0, import_jsx_runtime_react_server.jsx)("p", {
-								className: "mt-5 leading-7 text-slate-600",
-								children: "Paste text from a university, APS, uni-assist, or another official process. Get a simple explanation, actions, risk level, and an email draft."
-							}),
-							/* @__PURE__ */ (0, import_jsx_runtime_react_server.jsxs)(link_default, {
-								href: "/explain",
-								className: "mt-8 inline-flex items-center gap-2 text-sm font-semibold text-forest-800 underline decoration-lime-500 decoration-2 underline-offset-6 hover:text-forest-600",
-								children: ["Explain a document ", /* @__PURE__ */ (0, import_jsx_runtime_react_server.jsx)(ArrowIcon, {})]
-							})
-						]
+					className: "mx-auto max-w-7xl px-5 sm:px-8 lg:px-10",
+					children: [/* @__PURE__ */ (0, import_jsx_runtime_react_server.jsxs)("div", {
+						className: "max-w-3xl",
+						children: [/* @__PURE__ */ (0, import_jsx_runtime_react_server.jsx)("p", {
+							className: "section-kicker",
+							children: "Your working toolkit"
+						}), /* @__PURE__ */ (0, import_jsx_runtime_react_server.jsx)("h2", {
+							className: "section-title",
+							children: "Every tool hands work to the next one."
+						})]
+					}), /* @__PURE__ */ (0, import_jsx_runtime_react_server.jsx)("div", {
+						className: "mt-12 grid gap-4 md:grid-cols-2 lg:grid-cols-3",
+						children: TOOLKIT.map(([title, body, href], index) => /* @__PURE__ */ (0, import_jsx_runtime_react_server.jsxs)(link_default, {
+							href,
+							className: "group flex min-h-64 flex-col rounded-2xl border border-forest-900/10 bg-white p-7 transition hover:-translate-y-1 hover:border-forest-700/35 hover:shadow-[0_18px_50px_rgba(11,43,38,0.1)]",
+							children: [
+								/* @__PURE__ */ (0, import_jsx_runtime_react_server.jsxs)("span", {
+									className: "font-mono text-xs font-semibold text-forest-700",
+									children: ["0", index + 1]
+								}),
+								/* @__PURE__ */ (0, import_jsx_runtime_react_server.jsx)("h3", {
+									className: "mt-10 text-xl font-semibold tracking-[-0.025em] text-forest-950",
+									children: title
+								}),
+								/* @__PURE__ */ (0, import_jsx_runtime_react_server.jsx)("p", {
+									className: "mt-3 leading-7 text-slate-600",
+									children: body
+								}),
+								/* @__PURE__ */ (0, import_jsx_runtime_react_server.jsxs)("span", {
+									className: "mt-auto pt-6 text-sm font-semibold text-forest-700",
+									children: ["Open tool ", /* @__PURE__ */ (0, import_jsx_runtime_react_server.jsx)("span", {
+										"aria-hidden": "true",
+										children: "→"
+									})]
+								})
+							]
+						}, href))
 					})]
 				})
 			}),
@@ -14857,116 +15181,94 @@ function HomePage() {
 				className: "bg-white py-20 sm:py-24",
 				children: /* @__PURE__ */ (0, import_jsx_runtime_react_server.jsx)("div", {
 					className: "mx-auto max-w-7xl px-5 sm:px-8 lg:px-10",
-					children: /* @__PURE__ */ (0, import_jsx_runtime_react_server.jsx)("div", {
-						className: "rounded-[1.75rem] border border-forest-900/10 bg-forest-50 px-7 py-12 sm:px-12 lg:px-16",
-						children: /* @__PURE__ */ (0, import_jsx_runtime_react_server.jsxs)("div", {
-							className: "grid gap-10 lg:grid-cols-[1fr_1.1fr] lg:items-center",
-							children: [/* @__PURE__ */ (0, import_jsx_runtime_react_server.jsxs)("div", { children: [/* @__PURE__ */ (0, import_jsx_runtime_react_server.jsx)("p", {
+					children: /* @__PURE__ */ (0, import_jsx_runtime_react_server.jsxs)("div", {
+						className: "grid gap-10 lg:grid-cols-[0.75fr_1.25fr] lg:gap-16",
+						children: [/* @__PURE__ */ (0, import_jsx_runtime_react_server.jsxs)("div", { children: [
+							/* @__PURE__ */ (0, import_jsx_runtime_react_server.jsx)("p", {
 								className: "section-kicker",
-								children: "APS, uni-assist, VPD, visa clarity"
-							}), /* @__PURE__ */ (0, import_jsx_runtime_react_server.jsx)("h2", {
-								className: "mt-4 text-4xl font-semibold tracking-[-0.045em] text-forest-950",
-								children: "Understand the role of each step before you act."
-							})] }), /* @__PURE__ */ (0, import_jsx_runtime_react_server.jsxs)("div", { children: [/* @__PURE__ */ (0, import_jsx_runtime_react_server.jsx)("p", {
-								className: "text-lg leading-8 text-slate-600",
-								children: "ClearPath explains how these terms appear in your process while marking changing requirements that must be checked on official pages."
-							}), /* @__PURE__ */ (0, import_jsx_runtime_react_server.jsx)("div", {
-								className: "mt-7 flex flex-wrap gap-2.5",
+								children: "Current information, scoped carefully"
+							}),
+							/* @__PURE__ */ (0, import_jsx_runtime_react_server.jsx)("h2", {
+								className: "section-title",
+								children: "Changing facts are dated, sourced, and never treated as universal."
+							}),
+							/* @__PURE__ */ (0, import_jsx_runtime_react_server.jsx)("p", {
+								className: "section-copy",
+								children: "These are orientation facts. Your applicant category and responsible authority decide what applies."
+							})
+						] }), /* @__PURE__ */ (0, import_jsx_runtime_react_server.jsx)("div", {
+							className: "divide-y divide-slate-200 border-y border-slate-200",
+							children: CURRENT_UPDATES.map((fact) => /* @__PURE__ */ (0, import_jsx_runtime_react_server.jsxs)("article", {
+								className: "py-7",
 								children: [
-									"APS",
-									"uni-assist",
-									"VPD",
-									"University applications",
-									"Visa preparation"
-								].map((topic) => /* @__PURE__ */ (0, import_jsx_runtime_react_server.jsx)("span", {
-									className: "rounded-full border border-forest-700/20 bg-white px-4 py-2 text-sm font-semibold text-forest-800",
-									children: topic
-								}, topic))
-							})] })]
-						})
+									/* @__PURE__ */ (0, import_jsx_runtime_react_server.jsxs)("div", {
+										className: "flex flex-wrap items-center justify-between gap-3",
+										children: [/* @__PURE__ */ (0, import_jsx_runtime_react_server.jsx)("h3", {
+											className: "text-lg font-semibold text-forest-950",
+											children: fact.title
+										}), /* @__PURE__ */ (0, import_jsx_runtime_react_server.jsxs)("span", {
+											className: "pill",
+											children: ["Checked ", formatDate(fact.lastVerified)]
+										})]
+									}),
+									/* @__PURE__ */ (0, import_jsx_runtime_react_server.jsx)("p", {
+										className: "mt-3 leading-7 text-slate-600",
+										children: fact.summary
+									}),
+									/* @__PURE__ */ (0, import_jsx_runtime_react_server.jsx)("p", {
+										className: "mt-3 text-sm leading-6 text-amber-800",
+										children: fact.caution
+									}),
+									/* @__PURE__ */ (0, import_jsx_runtime_react_server.jsxs)("a", {
+										href: fact.sourceUrl,
+										target: "_blank",
+										rel: "noreferrer",
+										className: "mt-3 inline-block link-underline text-sm",
+										children: [fact.sourceLabel, " ↗"]
+									})
+								]
+							}, fact.id))
+						})]
 					})
 				})
 			}),
 			/* @__PURE__ */ (0, import_jsx_runtime_react_server.jsx)("section", {
-				className: "border-t border-slate-200 bg-white py-20 sm:py-24",
-				children: /* @__PURE__ */ (0, import_jsx_runtime_react_server.jsxs)("div", {
-					className: "mx-auto grid max-w-7xl gap-12 px-5 sm:px-8 lg:grid-cols-[0.9fr_1.1fr] lg:items-center lg:gap-20 lg:px-10",
-					children: [/* @__PURE__ */ (0, import_jsx_runtime_react_server.jsxs)("div", { children: [
-						/* @__PURE__ */ (0, import_jsx_runtime_react_server.jsx)("p", {
-							className: "section-kicker",
-							children: "Arrival and job path"
-						}),
-						/* @__PURE__ */ (0, import_jsx_runtime_react_server.jsx)("h2", {
-							className: "section-title",
-							children: "The plan does not stop at university applications."
-						}),
-						/* @__PURE__ */ (0, import_jsx_runtime_react_server.jsx)("p", {
-							className: "section-copy",
-							children: "Keep later stages visible without mixing them into today’s priorities. Prepare for arrival and the transition toward a Germany career path when the time is right."
-						})
-					] }), /* @__PURE__ */ (0, import_jsx_runtime_react_server.jsx)("div", {
-						className: "grid gap-4 sm:grid-cols-2",
-						children: [["Arrival preparation", "Keep accommodation, insurance, travel, and local registration questions organized."], ["Germany job path", "Map language, skills, applications, and career preparation alongside the study plan."]].map(([title, body], index) => /* @__PURE__ */ (0, import_jsx_runtime_react_server.jsxs)("article", {
-							className: "min-h-64 rounded-2xl border border-slate-200 bg-cream-50 p-7",
-							children: [
-								/* @__PURE__ */ (0, import_jsx_runtime_react_server.jsxs)("span", {
-									className: "font-mono text-xs font-semibold text-forest-700",
-									children: ["0", index + 1]
-								}),
-								/* @__PURE__ */ (0, import_jsx_runtime_react_server.jsx)("h3", {
-									className: "mt-16 text-xl font-semibold tracking-[-0.025em] text-forest-950",
-									children: title
-								}),
-								/* @__PURE__ */ (0, import_jsx_runtime_react_server.jsx)("p", {
-									className: "mt-3 leading-7 text-slate-600",
-									children: body
-								})
-							]
-						}, title))
-					})]
-				})
-			}),
-			/* @__PURE__ */ (0, import_jsx_runtime_react_server.jsx)("section", {
-				id: "safety",
 				className: "bg-amber-50 py-16",
 				children: /* @__PURE__ */ (0, import_jsx_runtime_react_server.jsxs)("div", {
 					className: "mx-auto grid max-w-7xl gap-7 px-5 sm:px-8 lg:grid-cols-[0.35fr_1.65fr] lg:items-start lg:px-10",
 					children: [/* @__PURE__ */ (0, import_jsx_runtime_react_server.jsx)("p", {
 						className: "section-kicker text-amber-800",
-						children: "Important disclaimer"
+						children: "The trust contract"
 					}), /* @__PURE__ */ (0, import_jsx_runtime_react_server.jsxs)("div", { children: [/* @__PURE__ */ (0, import_jsx_runtime_react_server.jsx)("h2", {
 						className: "text-2xl font-semibold tracking-[-0.03em] text-forest-950",
-						children: "Clear guidance, without false guarantees."
+						children: "Useful guidance without false certainty."
 					}), /* @__PURE__ */ (0, import_jsx_runtime_react_server.jsx)("p", {
 						className: "mt-4 max-w-4xl leading-7 text-slate-700",
-						children: "ClearPath Germany is an educational planning tool, not legal or immigration advice. It does not guarantee eligibility, admission, visa approval, or work authorization. Requirements and deadlines may change; verify critical information with the official university, German mission, APS office, or relevant authority before acting."
+						children: "ClearPath Germany is an educational planning tool, not a law firm, immigration adviser, university, or German authority. It does not guarantee eligibility, admission, a visa, or work authorisation. Device-saved progress remains local; remove personal identifiers before using the document explainer."
 					})] })]
 				})
 			}),
 			/* @__PURE__ */ (0, import_jsx_runtime_react_server.jsx)("section", {
-				className: "bg-forest-950 py-18 text-white",
+				className: "bg-lime-300 py-16 text-forest-950",
 				children: /* @__PURE__ */ (0, import_jsx_runtime_react_server.jsxs)("div", {
 					className: "mx-auto flex max-w-7xl flex-col gap-8 px-5 sm:px-8 lg:flex-row lg:items-center lg:justify-between lg:px-10",
 					children: [/* @__PURE__ */ (0, import_jsx_runtime_react_server.jsxs)("div", { children: [/* @__PURE__ */ (0, import_jsx_runtime_react_server.jsx)("p", {
-						className: "text-sm font-semibold uppercase tracking-[0.16em] text-lime-300",
-						children: "Start with your situation"
+						className: "text-sm font-semibold uppercase tracking-[0.16em]",
+						children: "Start with your real situation"
 					}), /* @__PURE__ */ (0, import_jsx_runtime_react_server.jsx)("h2", {
 						className: "mt-3 text-3xl font-semibold tracking-[-0.04em] sm:text-4xl",
 						children: "Your next step should not be a guess."
 					})] }), /* @__PURE__ */ (0, import_jsx_runtime_react_server.jsxs)(link_default, {
-						className: "inline-flex min-h-12 items-center justify-center gap-2 self-start rounded-full bg-lime-300 px-6 text-sm font-semibold text-forest-950 transition hover:bg-lime-200 focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-lime-300 lg:self-auto",
+						className: "inline-flex min-h-12 items-center justify-center gap-2 self-start rounded-full bg-forest-950 px-6 text-sm font-semibold text-white transition hover:bg-forest-800 focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-forest-950 lg:self-auto",
 						href: "/roadmap",
-						children: ["Build My Germany Roadmap ", /* @__PURE__ */ (0, import_jsx_runtime_react_server.jsx)(ArrowIcon, {})]
+						children: ["Build my roadmap ", /* @__PURE__ */ (0, import_jsx_runtime_react_server.jsx)("span", {
+							"aria-hidden": "true",
+							children: "→"
+						})]
 					})]
 				})
 			}),
-			/* @__PURE__ */ (0, import_jsx_runtime_react_server.jsx)("footer", {
-				className: "border-t border-white/10 bg-forest-950 py-8 text-white/55",
-				children: /* @__PURE__ */ (0, import_jsx_runtime_react_server.jsxs)("div", {
-					className: "mx-auto flex max-w-7xl flex-col gap-3 px-5 text-sm sm:px-8 md:flex-row md:items-center md:justify-between lg:px-10",
-					children: [/* @__PURE__ */ (0, import_jsx_runtime_react_server.jsx)("p", { children: "© 2026 ClearPath Germany" }), /* @__PURE__ */ (0, import_jsx_runtime_react_server.jsx)("p", { children: "Built for informed, independent planning." })]
-				})
-			})
+			/* @__PURE__ */ (0, import_jsx_runtime_react_server.jsx)(SiteFooter, {})
 		]
 	});
 }
@@ -14981,6 +15283,11 @@ var Resources = ((React, deps, RemoveDuplicateServerCss, precedence) => {
 		})), RemoveDuplicateServerCss && React.createElement(RemoveDuplicateServerCss, { key: "remove-duplicate-css" })]);
 	};
 })(import_react_react_server.default, assetsManifest.serverResources["app/layout.tsx"], void 0, "vite-rsc/importer-resources");
+//#endregion
+//#region components/DesktopNav.tsx
+var DesktopNav_default = /* @__PURE__ */ registerClientReference(() => {
+	throw new Error("Unexpectedly client reference export 'default' is called on server");
+}, "2a890664aa43", "default");
 //#endregion
 //#region components/MobileNav.tsx
 var MobileNav_default = /* @__PURE__ */ registerClientReference(() => {
@@ -15013,42 +15320,7 @@ function Header() {
 						})]
 					})]
 				}),
-				/* @__PURE__ */ (0, import_jsx_runtime_react_server.jsxs)("nav", {
-					"aria-label": "Primary navigation",
-					className: "hidden items-center gap-6 text-sm font-medium text-slate-700 lg:flex",
-					children: [
-						/* @__PURE__ */ (0, import_jsx_runtime_react_server.jsx)(link_default, {
-							className: "nav-link",
-							href: "/explore",
-							children: "Explore"
-						}),
-						/* @__PURE__ */ (0, import_jsx_runtime_react_server.jsx)(link_default, {
-							className: "nav-link",
-							href: "/roadmap",
-							children: "Roadmap"
-						}),
-						/* @__PURE__ */ (0, import_jsx_runtime_react_server.jsx)(link_default, {
-							className: "nav-link",
-							href: "/explain",
-							children: "Explain"
-						}),
-						/* @__PURE__ */ (0, import_jsx_runtime_react_server.jsx)(link_default, {
-							className: "nav-link",
-							href: "/deadlines",
-							children: "Deadlines"
-						}),
-						/* @__PURE__ */ (0, import_jsx_runtime_react_server.jsx)(link_default, {
-							className: "nav-link",
-							href: "/finance",
-							children: "Finance"
-						}),
-						/* @__PURE__ */ (0, import_jsx_runtime_react_server.jsx)(link_default, {
-							className: "nav-link",
-							href: "/guides",
-							children: "Guides"
-						})
-					]
-				}),
+				/* @__PURE__ */ (0, import_jsx_runtime_react_server.jsx)(DesktopNav_default, {}),
 				/* @__PURE__ */ (0, import_jsx_runtime_react_server.jsxs)("div", {
 					className: "flex items-center gap-2",
 					children: [/* @__PURE__ */ (0, import_jsx_runtime_react_server.jsx)(MobileNav_default, {}), /* @__PURE__ */ (0, import_jsx_runtime_react_server.jsxs)(link_default, {
@@ -15056,10 +15328,10 @@ function Header() {
 						className: "inline-flex min-h-10 items-center justify-center rounded-full bg-forest-900 px-4 text-sm font-semibold text-white transition hover:bg-forest-700 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-forest-700 sm:px-5",
 						children: [/* @__PURE__ */ (0, import_jsx_runtime_react_server.jsx)("span", {
 							className: "sm:hidden",
-							children: "Hub"
+							children: "My plan"
 						}), /* @__PURE__ */ (0, import_jsx_runtime_react_server.jsx)("span", {
 							className: "hidden sm:inline",
-							children: "My hub"
+							children: "My control room"
 						})]
 					})]
 				})
@@ -15071,11 +15343,63 @@ function Header() {
 //#region app/layout.tsx
 var layout_exports = /* @__PURE__ */ __exportAll({
 	default: () => $$wrap_RootLayout,
-	metadata: () => metadata$1
+	generateMetadata: () => generateMetadata$1,
+	viewport: () => viewport
 });
-var metadata$1 = {
-	title: "ClearPath Germany | Your Germany application roadmap",
-	description: "Build a structured Germany study and career roadmap, understand confusing documents, and see what to do next."
+var FALLBACK_SITE_URL = "https://clearpath-germany.mekalasaathwik2002.chatgpt.site";
+async function generateMetadata$1() {
+	const requestHeaders = await headers$1();
+	const host = requestHeaders.get("x-forwarded-host") ?? requestHeaders.get("host");
+	const protocol = requestHeaders.get("x-forwarded-proto") ?? (host?.includes("localhost") ? "http" : "https");
+	const origin = host ? `${protocol}://${host}` : process.env.NEXT_PUBLIC_SITE_URL ?? FALLBACK_SITE_URL;
+	return {
+		metadataBase: new URL(origin),
+		title: {
+			default: "ClearPath Germany | Germany application control room",
+			template: "%s | ClearPath Germany"
+		},
+		description: "Find German study programs, build a source-backed roadmap, track deadlines and finances, and turn official requirements into clear next actions.",
+		applicationName: "ClearPath Germany",
+		keywords: [
+			"study in Germany",
+			"German university applications",
+			"APS India",
+			"uni-assist",
+			"student visa Germany"
+		],
+		authors: [{ name: "ClearPath Germany" }],
+		creator: "ClearPath Germany",
+		openGraph: {
+			type: "website",
+			locale: "en_GB",
+			siteName: "ClearPath Germany",
+			title: "ClearPath Germany - know your next step",
+			description: "A private-by-default control room for planning a Germany study application with official verification built in.",
+			url: origin,
+			images: [{
+				url: `${origin}/og.png`,
+				width: 1792,
+				height: 920,
+				alt: "ClearPath Germany - Know your next step."
+			}]
+		},
+		twitter: {
+			card: "summary_large_image",
+			title: "ClearPath Germany - know your next step",
+			description: "Plan programs, requirements, deadlines, finances, visa preparation, and arrival in one place.",
+			images: [`${origin}/og.png`]
+		},
+		robots: {
+			index: true,
+			follow: true
+		}
+	};
+}
+var viewport = {
+	width: "device-width",
+	initialScale: 1,
+	themeColor: "#092c27",
+	colorScheme: "light"
 };
 function RootLayout({ children }) {
 	return /* @__PURE__ */ (0, import_jsx_runtime_react_server.jsx)("html", {
@@ -15101,16 +15425,11 @@ function __vite_rsc_wrap_css__(value, name) {
 	return __wrapper;
 }
 //#endregion
-//#region components/SiteFooter.tsx
-function SiteFooter() {
-	return /* @__PURE__ */ (0, import_jsx_runtime_react_server.jsx)("footer", {
-		className: "border-t border-white/10 bg-forest-950 py-8 text-white/55",
-		children: /* @__PURE__ */ (0, import_jsx_runtime_react_server.jsxs)("div", {
-			className: "mx-auto flex max-w-7xl flex-col gap-3 px-5 text-sm sm:px-8 md:flex-row md:items-center md:justify-between lg:px-10",
-			children: [/* @__PURE__ */ (0, import_jsx_runtime_react_server.jsx)("p", { children: "© 2026 ClearPath Germany" }), /* @__PURE__ */ (0, import_jsx_runtime_react_server.jsx)("p", { children: "Educational planning only. Always verify with official sources." })]
-		})
-	});
-}
+//#region app/error.tsx
+var error_exports = /* @__PURE__ */ __exportAll({ default: () => error_default });
+var error_default = /* @__PURE__ */ registerClientReference(() => {
+	throw new Error("Unexpectedly client reference export 'default' is called on server");
+}, "a9bbde40cf2d", "default");
 //#endregion
 //#region app/not-found.tsx
 var not_found_exports = /* @__PURE__ */ __exportAll({ default: () => NotFound });
@@ -15272,12 +15591,12 @@ var guides = [
 		readingMinutes: 6,
 		sections: [
 			{
-				heading: "When to start",
-				body: "Begin as soon as you have an admission or a strong shortlist. Appointment availability at German missions varies widely by country and season, so treat early booking as a priority."
+				heading: "Use the responsible mission and online portal",
+				body: "After admission, follow the German mission responsible for your place of residence. The Federal Foreign Office says national visa applications can be prepared and submitted through the Consular Services Portal, but local document and appointment steps can still differ."
 			},
 			{
 				heading: "Common building blocks",
-				body: "Most applications ask for admission or an application confirmation, proof of financial resources (often a blocked account), health insurance, a valid passport, and the visa application forms. The exact checklist depends on your local German mission."
+				body: "A study-visa application normally requires admission, proof of financial resources, health-insurance evidence, a valid passport, and the forms or digital steps specified by the responsible mission. A blocked account is one possible form of financial proof, not the only one."
 			},
 			{
 				heading: "Verify before you act",
@@ -15285,13 +15604,13 @@ var guides = [
 			}
 		],
 		resources: [{
-			label: "Federal Foreign Office: visa for study",
-			url: "https://www.auswaertiges-amt.de/en/visa-service",
-			last_verified: "2026-07-04"
+			label: "Federal Foreign Office: visas for Germany",
+			url: "https://www.auswaertiges-amt.de/en/visa-service/215870-215870",
+			last_verified: "2026-07-11"
 		}, {
 			label: "Make it in Germany: student visa",
-			url: "https://www.make-it-in-germany.com/en/studying-training/studying/visa",
-			last_verified: "2026-07-04"
+			url: "https://www.make-it-in-germany.com/en/visa-residence/types/studying",
+			last_verified: "2026-07-11"
 		}]
 	},
 	{
@@ -15302,7 +15621,7 @@ var guides = [
 		readingMinutes: 5,
 		sections: [{
 			heading: "What it is",
-			body: "The APS (Akademische Prüfstelle) verifies academic documents for applicants from some countries, including India, China, and Vietnam. The process and whether you need it depend entirely on your country of study."
+			body: "The APS (Akademische Prüfstelle) verifies academic documents for applicants from certain countries. The office, procedure, and whether a certificate is required depend on where your qualifications were earned and the route you are using."
 		}, {
 			heading: "Why it matters",
 			body: "Where required, an APS certificate is often needed before you can apply to universities or for a visa. Missing it can block your application, so check early whether your country has an APS requirement."
@@ -15328,12 +15647,12 @@ var guides = [
 			body: "Many universities process international applications through uni-assist, which checks documents and forwards eligible applications. Some universities accept direct applications instead. Always confirm the route on the program page."
 		}, {
 			heading: "VPD",
-			body: "A VPD (Vorpruefungsdokumentation) is a preliminary review of your qualifications, sometimes required by universities that accept direct applications. It states your converted grade and eligibility."
+			body: "A VPD (Vorprüfungsdokumentation) is issued by uni-assist for a specific university. It documents the certificates reviewed and the German-grade evaluation. You normally submit it yourself to the university before that university's deadline."
 		}],
 		resources: [{
 			label: "uni-assist official site",
-			url: "https://www.uni-assist.de/en/",
-			last_verified: "2026-07-04"
+			url: "https://www.uni-assist.de/en/how-to-apply/plan-your-application/vpd/",
+			last_verified: "2026-07-11"
 		}]
 	},
 	{
@@ -15347,12 +15666,12 @@ var guides = [
 			body: "A blocked account is a common way to prove you can cover living costs during your studies. You deposit a set amount and can withdraw a limited sum each month after arrival."
 		}, {
 			heading: "The amount changes",
-			body: "The required minimum is set by the authorities and is updated periodically. Never rely on a figure you saw in an old forum post; confirm the current amount on an official source before opening an account."
+			body: "For 2026, official study-visa guidance lists at least EUR 11,904 in a blocked account as one way to prove funds. The amount is updated over time, and a scholarship or declaration of commitment may also be accepted. Confirm the amount and method with the German mission handling your case before transferring money."
 		}],
 		resources: [{
-			label: "Federal Foreign Office: financing your studies",
-			url: "https://www.auswaertiges-amt.de/en/visa-service",
-			last_verified: "2026-07-04"
+			label: "Make it in Germany: student visa finances",
+			url: "https://www.make-it-in-germany.com/en/visa-residence/types/studying",
+			last_verified: "2026-07-11"
 		}]
 	},
 	{
@@ -15363,15 +15682,15 @@ var guides = [
 		readingMinutes: 4,
 		sections: [{
 			heading: "Mandatory coverage",
-			body: "Health insurance is required to enroll and usually to obtain a visa. Students under a certain age typically qualify for public statutory insurance at student rates, but eligibility rules vary."
+			body: "Health insurance is mandatory in Germany and proof is commonly needed for enrolment and visa steps. Students are generally in statutory insurance, but exceptions—including some students over 30—mean eligibility must be checked for the individual case."
 		}, {
 			heading: "Confirm eligibility",
 			body: "Whether you can use public insurance depends on your age, program, and status. Confirm your options with an insurer and your university before you enroll."
 		}],
 		resources: [{
 			label: "Make it in Germany: insurance",
-			url: "https://www.make-it-in-germany.com/en/living-in-germany/insurance",
-			last_verified: "2026-07-04"
+			url: "https://www.make-it-in-germany.com/en/living-in-germany/money-insurance/health-insurance",
+			last_verified: "2026-07-11"
 		}]
 	},
 	{
@@ -15401,15 +15720,15 @@ var guides = [
 		readingMinutes: 4,
 		sections: [{
 			heading: "Work allowance",
-			body: "International students are generally allowed to work a limited number of days per year. Exceeding the allowance can affect your residence status, so track your working days carefully."
+			body: "Official guidance states that many students from third countries may work up to 140 full days or 280 half days per year, or up to 20 hours per week. Student-assistant work and individual residence conditions can be treated differently."
 		}, {
 			heading: "Check current rules",
-			body: "Work rules for students can change. Confirm the current allowance and any conditions with the Ausländerbehörde or an official source before taking a job."
+			body: "Your residence title, study status, and the type of job affect what is allowed. Confirm the conditions on your residence title or with the local foreigners authority before starting work."
 		}],
 		resources: [{
 			label: "Make it in Germany: working as a student",
-			url: "https://www.make-it-in-germany.com/en/studying-training/studying/work",
-			last_verified: "2026-07-04"
+			url: "https://www.make-it-in-germany.com/en/visa-residence/types/studying",
+			last_verified: "2026-07-11"
 		}]
 	},
 	{
@@ -15420,15 +15739,15 @@ var guides = [
 		readingMinutes: 4,
 		sections: [{
 			heading: "Register your address",
-			body: "Most people must register their address (Anmeldung) at the local registration office within a set window after moving in. You usually need this before opening some services."
+			body: "Official guidance says you should register your address at the local registration office within two weeks of moving into a residence. Check the local city website for appointments and required documents such as the landlord confirmation."
 		}, {
 			heading: "Residence permit and enrollment",
-			body: "You will typically enroll at your university and apply for a residence permit at the Ausländerbehörde. Book appointments early, as they can be scarce."
+			body: "Complete enrolment by the deadline in your admission letter. If you need a student residence permit, follow the local foreigners authority's process early because appointments and required documents are managed locally."
 		}],
 		resources: [{
 			label: "Make it in Germany: after arrival",
-			url: "https://www.make-it-in-germany.com/en/living-in-germany",
-			last_verified: "2026-07-04"
+			url: "https://www.make-it-in-germany.com/en/study-vocational-training/studies-in-germany/planning",
+			last_verified: "2026-07-11"
 		}]
 	}
 ];
@@ -15651,17 +15970,6 @@ var page_default = /* @__PURE__ */ registerClientReference(() => {
 	throw new Error("Unexpectedly client reference export 'default' is called on server");
 }, "7dec43c32071", "default");
 //#endregion
-//#region lib/catalog.ts
-function formatDate(value) {
-	const parsed = new Date(value);
-	if (Number.isNaN(parsed.getTime())) return value;
-	return parsed.toLocaleDateString("en-GB", {
-		day: "numeric",
-		month: "short",
-		year: "numeric"
-	});
-}
-//#endregion
 //#region app/guides/[slug]/page.tsx
 var page_exports = /* @__PURE__ */ __exportAll({
 	default: () => GuideDetailPage,
@@ -15759,6 +16067,50 @@ async function GuideDetailPage({ params }) {
 	});
 }
 //#endregion
+//#region app/robots.ts
+var robots_exports = /* @__PURE__ */ __exportAll({ default: () => robots });
+function robots() {
+	return {
+		rules: {
+			userAgent: "*",
+			allow: "/"
+		},
+		sitemap: `${process.env.NEXT_PUBLIC_SITE_URL ?? "https://clearpath-germany.com"}/sitemap.xml`
+	};
+}
+//#endregion
+//#region app/sitemap.ts
+var sitemap_exports = /* @__PURE__ */ __exportAll({ default: () => sitemap });
+var ROUTES = [
+	"",
+	"/hub",
+	"/explore",
+	"/compare",
+	"/shortlist",
+	"/roadmap",
+	"/explain",
+	"/deadlines",
+	"/finance",
+	"/guides",
+	"/search"
+];
+function sitemap() {
+	const baseUrl = process.env.NEXT_PUBLIC_SITE_URL ?? "https://clearpath-germany.mekalasaathwik2002.chatgpt.site";
+	const staticRoutes = ROUTES.map((route) => ({
+		url: `${baseUrl}${route}`,
+		lastModified: /* @__PURE__ */ new Date("2026-07-11"),
+		changeFrequency: route === "" ? "weekly" : "monthly",
+		priority: route === "" ? 1 : route === "/hub" || route === "/explore" ? .9 : .7
+	}));
+	const guideRoutes = guides.map((guide) => ({
+		url: `${baseUrl}/guides/${guide.slug}`,
+		lastModified: /* @__PURE__ */ new Date("2026-07-11"),
+		changeFrequency: "monthly",
+		priority: .6
+	}));
+	return [...staticRoutes, ...guideRoutes];
+}
+//#endregion
 //#region \0virtual:vinext-rsc-entry
 var renderToReadableStream = createRscRenderer(renderToReadableStream$1);
 function _getSSRFontStyles() {
@@ -15810,12 +16162,12 @@ var routes = [
 		templateTreePositions: [],
 		layoutTreePositions: [0],
 		templates: [],
-		errors: [null],
-		errorPaths: [],
-		errorTreePositions: [],
+		errors: [error_exports],
+		errorPaths: [error_exports],
+		errorTreePositions: [0],
 		slots: {},
 		loading: null,
-		error: null,
+		error: error_exports,
 		notFound: not_found_exports,
 		notFounds: [not_found_exports],
 		forbidden: null,
@@ -15847,9 +16199,9 @@ var routes = [
 		templateTreePositions: [],
 		layoutTreePositions: [0],
 		templates: [],
-		errors: [null],
-		errorPaths: [],
-		errorTreePositions: [],
+		errors: [error_exports],
+		errorPaths: [error_exports],
+		errorTreePositions: [0],
 		slots: {},
 		loading: null,
 		error: null,
@@ -15884,9 +16236,9 @@ var routes = [
 		templateTreePositions: [],
 		layoutTreePositions: [0],
 		templates: [],
-		errors: [null],
-		errorPaths: [],
-		errorTreePositions: [],
+		errors: [error_exports],
+		errorPaths: [error_exports],
+		errorTreePositions: [0],
 		slots: {},
 		loading: null,
 		error: null,
@@ -15921,9 +16273,9 @@ var routes = [
 		templateTreePositions: [],
 		layoutTreePositions: [0],
 		templates: [],
-		errors: [null],
-		errorPaths: [],
-		errorTreePositions: [],
+		errors: [error_exports],
+		errorPaths: [error_exports],
+		errorTreePositions: [0],
 		slots: {},
 		loading: null,
 		error: null,
@@ -15958,9 +16310,9 @@ var routes = [
 		templateTreePositions: [],
 		layoutTreePositions: [0],
 		templates: [],
-		errors: [null],
-		errorPaths: [],
-		errorTreePositions: [],
+		errors: [error_exports],
+		errorPaths: [error_exports],
+		errorTreePositions: [0],
 		slots: {},
 		loading: null,
 		error: null,
@@ -15995,9 +16347,9 @@ var routes = [
 		templateTreePositions: [],
 		layoutTreePositions: [0],
 		templates: [],
-		errors: [null],
-		errorPaths: [],
-		errorTreePositions: [],
+		errors: [error_exports],
+		errorPaths: [error_exports],
+		errorTreePositions: [0],
 		slots: {},
 		loading: null,
 		error: null,
@@ -16032,9 +16384,9 @@ var routes = [
 		templateTreePositions: [],
 		layoutTreePositions: [0],
 		templates: [],
-		errors: [null],
-		errorPaths: [],
-		errorTreePositions: [],
+		errors: [error_exports],
+		errorPaths: [error_exports],
+		errorTreePositions: [0],
 		slots: {},
 		loading: null,
 		error: null,
@@ -16069,9 +16421,9 @@ var routes = [
 		templateTreePositions: [],
 		layoutTreePositions: [0],
 		templates: [],
-		errors: [null],
-		errorPaths: [],
-		errorTreePositions: [],
+		errors: [error_exports],
+		errorPaths: [error_exports],
+		errorTreePositions: [0],
 		slots: {},
 		loading: null,
 		error: null,
@@ -16106,9 +16458,9 @@ var routes = [
 		templateTreePositions: [],
 		layoutTreePositions: [0],
 		templates: [],
-		errors: [null],
-		errorPaths: [],
-		errorTreePositions: [],
+		errors: [error_exports],
+		errorPaths: [error_exports],
+		errorTreePositions: [0],
 		slots: {},
 		loading: null,
 		error: null,
@@ -16143,9 +16495,9 @@ var routes = [
 		templateTreePositions: [],
 		layoutTreePositions: [0],
 		templates: [],
-		errors: [null],
-		errorPaths: [],
-		errorTreePositions: [],
+		errors: [error_exports],
+		errorPaths: [error_exports],
+		errorTreePositions: [0],
 		slots: {},
 		loading: null,
 		error: null,
@@ -16180,9 +16532,9 @@ var routes = [
 		templateTreePositions: [],
 		layoutTreePositions: [0],
 		templates: [],
-		errors: [null],
-		errorPaths: [],
-		errorTreePositions: [],
+		errors: [error_exports],
+		errorPaths: [error_exports],
+		errorTreePositions: [0],
 		slots: {},
 		loading: null,
 		error: null,
@@ -16225,9 +16577,9 @@ var routes = [
 		templateTreePositions: [],
 		layoutTreePositions: [0],
 		templates: [],
-		errors: [null],
-		errorPaths: [],
-		errorTreePositions: [],
+		errors: [error_exports],
+		errorPaths: [error_exports],
+		errorTreePositions: [0],
 		slots: {},
 		loading: null,
 		error: null,
@@ -16270,9 +16622,9 @@ var routes = [
 		templateTreePositions: [],
 		layoutTreePositions: [0],
 		templates: [],
-		errors: [null],
-		errorPaths: [],
-		errorTreePositions: [],
+		errors: [error_exports],
+		errorPaths: [error_exports],
+		errorTreePositions: [0],
 		slots: {},
 		loading: null,
 		error: null,
@@ -16307,9 +16659,9 @@ var routes = [
 		templateTreePositions: [],
 		layoutTreePositions: [0],
 		templates: [],
-		errors: [null],
-		errorPaths: [],
-		errorTreePositions: [],
+		errors: [error_exports],
+		errorPaths: [error_exports],
+		errorTreePositions: [0],
 		slots: {},
 		loading: null,
 		error: null,
@@ -16322,22 +16674,44 @@ var routes = [
 	}
 ];
 var __routeMatcher = createAppRscRouteMatcher(routes);
-var metadataRoutes = [{
-	type: "icon",
-	isDynamic: false,
-	routePrefix: "",
-	routeSegments: [],
-	servedUrl: "/icon.svg",
-	contentType: "image/svg+xml",
-	contentHash: "ca231344b28e1661",
-	headData: {
-		"kind": "icon",
-		"href": "/icon.svg?ca231344b28e1661",
-		"type": "image/svg+xml",
-		"sizes": "any"
+var metadataRoutes = [
+	{
+		type: "icon",
+		isDynamic: false,
+		routePrefix: "",
+		routeSegments: [],
+		servedUrl: "/icon.svg",
+		contentType: "image/svg+xml",
+		contentHash: "ca231344b28e1661",
+		headData: {
+			"kind": "icon",
+			"href": "/icon.svg?ca231344b28e1661",
+			"type": "image/svg+xml",
+			"sizes": "any"
+		},
+		fileDataBase64: "PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCA2NCA2NCI+CiAgPHJlY3Qgd2lkdGg9IjY0IiBoZWlnaHQ9IjY0IiByeD0iMzIiIGZpbGw9IiMxMDNhMzIiLz4KICA8cGF0aCBkPSJNMzcgMTMgMjUgNDMiIHN0cm9rZT0iI2M5ZWM3MiIgc3Ryb2tlLXdpZHRoPSI3IiBzdHJva2UtbGluZWNhcD0icm91bmQiLz4KICA8Y2lyY2xlIGN4PSIyMyIgY3k9IjQzIiByPSI4IiBmaWxsPSJub25lIiBzdHJva2U9IiNmZmYiIHN0cm9rZS13aWR0aD0iNSIvPgo8L3N2Zz4KCg=="
 	},
-	fileDataBase64: "PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCA2NCA2NCI+CiAgPHJlY3Qgd2lkdGg9IjY0IiBoZWlnaHQ9IjY0IiByeD0iMzIiIGZpbGw9IiMxMDNhMzIiLz4KICA8cGF0aCBkPSJNMzcgMTMgMjUgNDMiIHN0cm9rZT0iI2M5ZWM3MiIgc3Ryb2tlLXdpZHRoPSI3IiBzdHJva2UtbGluZWNhcD0icm91bmQiLz4KICA8Y2lyY2xlIGN4PSIyMyIgY3k9IjQzIiByPSI4IiBmaWxsPSJub25lIiBzdHJva2U9IiNmZmYiIHN0cm9rZS13aWR0aD0iNSIvPgo8L3N2Zz4KCg=="
-}];
+	{
+		type: "robots",
+		isDynamic: true,
+		routePrefix: "",
+		routeSegments: [],
+		servedUrl: "/robots.txt",
+		contentType: "text/plain",
+		contentHash: "c6464a34b5a0605a",
+		module: robots_exports
+	},
+	{
+		type: "sitemap",
+		isDynamic: true,
+		routePrefix: "",
+		routeSegments: [],
+		servedUrl: "/sitemap.xml",
+		contentType: "application/xml",
+		contentHash: "8f02c45b3458a19f",
+		module: sitemap_exports
+	}
+];
 var rootNotFoundModule = not_found_exports;
 var rootForbiddenModule = null;
 var rootUnauthorizedModule = null;
@@ -16406,7 +16780,7 @@ var __configRewrites = {
 	"fallback": []
 };
 var __configHeaders = [];
-var __publicFiles = /* @__PURE__ */ new Set([]);
+var __publicFiles = new Set(["/og.png"]);
 var __allowedOrigins = [];
 var __expireTime = 31536e3;
 var __allowedDevOrigins = [];
@@ -17236,7 +17610,7 @@ function roadmapActions(profile, stage) {
 	const actions = [];
 	if (stage === "plan") {
 		actions.push(`Shortlist 8-12 ${profile.target_degree} programs in ${profile.field} for the ${profile.target_intake} intake.`, "Confirm each program's application route: direct, uni-assist, or VPD.");
-		if (profile.aps_status === "unsure") actions.push("Check whether your country requires an APS certificate; it can add months.");
+		if (profile.aps_status === "unsure") actions.push("Check whether your qualifications require APS verification; treat it as a potentially long-lead step.");
 		if (profile.language_test_status === "not_started") actions.push(`Book a ${profile.study_language === "English" ? "IELTS or TOEFL" : "TestDaF or DSH"} test date; slots fill up early.`);
 		actions.push("List the academic documents you already have and note what is missing.", "Map each shortlisted program's deadline into a single calendar.", "Estimate your budget with living costs, semester fees, and the blocked account.");
 	} else if (stage === "prepare") {
@@ -17254,7 +17628,7 @@ function roadmapActions(profile, stage) {
 	} else if (stage === "visa") {
 		if (profile.finance_status !== "ready") actions.push("Finalize financial proof; the blocked account confirmation is usually required at the appointment.");
 		actions.push("Book the visa appointment immediately; waits can be long.", "Arrange health insurance coverage valid from your arrival date.", "Gather the mission's exact document checklist and follow its order precisely.", "Accept your admission and complete any enrollment steps the university requires now.", "Start looking for accommodation; apply to student dormitories early.");
-	} else actions.push("Book travel and temporary accommodation for your first weeks.", "Prepare original documents in your hand luggage: admission, insurance, financial proof.", "Register your address (Anmeldung) soon after moving in.", "Open a regular bank account and activate blocked account payouts.", "Enroll at the university and get your semester documents.", "Book the residence permit appointment at the Auslaenderbehoerde early.");
+	} else actions.push("Book travel and temporary accommodation for your first weeks.", "Prepare original documents in your hand luggage: admission, insurance, financial proof.", "Register your address (Anmeldung) within the official local window after moving in.", "Open a regular bank account and activate blocked account payouts.", "Enrol at the university and get your semester documents.", "Check the local foreigners authority's residence-permit process early.");
 	actions.push("Verify every requirement above on the official page before acting on it.");
 	return actions.slice(0, 10);
 }
@@ -17339,26 +17713,26 @@ var mistakes = {
 var commonResources = [{
 	label: "DAAD: study programme search",
 	url: "https://www.daad.de/en/studying-in-germany/",
-	last_verified: "2026-07-04"
+	last_verified: "2026-07-11"
 }, {
 	label: "Make it in Germany: study guide",
-	url: "https://www.make-it-in-germany.com/en/studying-training/studying",
-	last_verified: "2026-07-04"
+	url: "https://www.make-it-in-germany.com/en/study-vocational-training/studies-in-germany",
+	last_verified: "2026-07-11"
 }];
 var apsResource = {
-	label: "APS: check whether your country requires it",
+	label: "APS: check whether your qualifications require it",
 	url: "https://www.aps-india.de/",
-	last_verified: "2026-07-04"
+	last_verified: "2026-07-11"
 };
 var assistResource = {
-	label: "uni-assist: application processing and VPD",
-	url: "https://www.uni-assist.de/en/",
-	last_verified: "2026-07-04"
+	label: "uni-assist: deadlines, processing, and VPD",
+	url: "https://www.uni-assist.de/en/how-to-apply/plan-your-application/deadlines-processing-time/",
+	last_verified: "2026-07-11"
 };
 var visaResource = {
-	label: "Federal Foreign Office: visa for study",
-	url: "https://www.auswaertiges-amt.de/en/visa-service",
-	last_verified: "2026-07-04"
+	label: "Federal Foreign Office: visas for Germany",
+	url: "https://www.auswaertiges-amt.de/en/visa-service/215870-215870",
+	last_verified: "2026-07-11"
 };
 function generateRoadmap(profile) {
 	const stage = stageFor(profile), [title, summary] = stageMeta[stage], [now, later] = roadmapDocuments(stage, profile);

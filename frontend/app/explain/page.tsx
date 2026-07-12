@@ -8,7 +8,7 @@ import { ApiError } from "@/lib/api";
 import { explainText, RISK_STYLES, type ExplainResponse } from "@/lib/explain";
 
 const SAMPLE_TEXT =
-  "We are pleased to inform you that you have been admitted to the M.Sc. Informatics program for the winter semester. Please accept your offer by 15 July 2026 through the online portal and submit proof of health insurance before enrollment.";
+  "We are pleased to inform you that you have been admitted to the M.Sc. Informatics program. Please accept your offer by 30 September 2026 through the online portal and submit proof of health insurance before enrollment.";
 
 export default function ExplainPage() {
   const [text, setText] = useState("");
@@ -64,7 +64,7 @@ export default function ExplainPage() {
       </section>
 
       <div className="mx-auto max-w-4xl space-y-8 px-5 py-10 sm:px-8 lg:px-10">
-        <div className="rounded-lg bg-amber-50 px-4 py-3 text-sm leading-6 text-amber-900">
+        <div id="text-privacy" className="rounded-lg bg-amber-50 px-4 py-3 text-sm leading-6 text-amber-900">
           Privacy: remove your name, passport number, address, and account numbers before pasting.
           Text is analyzed on the server and not stored.
         </div>
@@ -75,10 +75,14 @@ export default function ExplainPage() {
             id="text"
             className="field-input min-h-48 resize-y py-3"
             value={text}
+            maxLength={8000}
             onChange={(e) => setText(e.target.value)}
             placeholder="Paste the full text here..."
+            aria-describedby="text-privacy text-count"
           />
+          <div id="text-count" className="flex items-center justify-between gap-3 text-xs text-slate-500"><span>{text.trim().length < 40 ? `${40 - text.trim().length} more characters needed` : "Ready to analyse"}</span><span>{text.length.toLocaleString()}/8,000</span></div>
           <div className="flex flex-wrap gap-3">
+            {text && <button type="button" className="secondary-button" onClick={() => { setText(""); setResult(null); setError(null); }}>Clear</button>}
             <button type="button" className="secondary-button" onClick={() => setText(SAMPLE_TEXT)}>
               Try sample admission letter
             </button>

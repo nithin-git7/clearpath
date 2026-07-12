@@ -1,10 +1,10 @@
 # ClearPath Germany frontend
 
-This directory contains the Next.js App Router frontend. Alongside the landing page, it provides the all-in-one hub: `/explore` (university and course explorer plus detail pages), `/deadlines`, `/finance`, `/hub`, `/shortlist`, `/guides`, and `/search`.
+This directory contains the Next.js App Router frontend. The production surface includes the situation-led home page, Application Control Room (`/hub`), program explorer and detail pages, shortlist, comparison, deadline tracker, itemized finance planner, personalized roadmap, document explainer, guides, and global search.
 
 These pages read from the backend catalog API using `lib/catalog.ts`, so start the backend (see `backend/README.md`) before using them. Personalization (shortlist, checklists, saved deadlines, journey progress) is stored in the browser via `lib/storage.ts`.
 
-The `/roadmap` and `/explain` links intentionally point to routes scheduled for later sections and are not implemented yet.
+Changing or high-risk information is presented with cautious wording, a verification date, and an official source. Device-local progress is intentionally private by default; clearing browser storage clears saved progress.
 
 ## Setup
 

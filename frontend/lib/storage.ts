@@ -1,6 +1,6 @@
 "use client";
 
-import { useCallback, useEffect, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 
 const SHORTLIST_KEY = "clearpath:shortlist";
 const COMPARE_KEY = "clearpath:compare";
@@ -17,7 +17,9 @@ function readList(key: string): string[] {
   try {
     const raw = window.localStorage.getItem(key);
     const parsed = raw ? (JSON.parse(raw) as unknown) : [];
-    return Array.isArray(parsed) ? (parsed as string[]) : [];
+    return Array.isArray(parsed)
+      ? [...new Set(parsed.filter((item): item is string => typeof item === "string" && item.length > 0))]
+      : [];
   } catch {
     return [];
   }
@@ -30,44 +32,65 @@ function readMap(key: string): Record<string, boolean> {
   try {
     const raw = window.localStorage.getItem(key);
     const parsed = raw ? (JSON.parse(raw) as unknown) : {};
-    return parsed && typeof parsed === "object" ? (parsed as Record<string, boolean>) : {};
+    if (!parsed || typeof parsed !== "object" || Array.isArray(parsed)) {
+      return {};
+    }
+    return Object.fromEntries(
+      Object.entries(parsed).filter(
+        (entry): entry is [string, boolean] => entry[0].length > 0 && typeof entry[1] === "boolean",
+      ),
+    );
   } catch {
     return {};
   }
 }
 
+function writeStorage(key: string, value: unknown): void {
+  if (typeof window === "undefined") return;
+  try {
+    window.localStorage.setItem(key, JSON.stringify(value));
+  } catch {
+    // Keep the in-memory interaction working when storage is blocked or full.
+  }
+}
+
 function useStoredList(key: string) {
   const [items, setItems] = useState<string[]>([]);
+  const itemsRef = useRef<string[]>([]);
   const [ready, setReady] = useState(false);
 
   useEffect(() => {
+    const stored = readList(key);
+    itemsRef.current = stored;
     // Hydrate from localStorage after mount to avoid SSR hydration mismatches.
     // eslint-disable-next-line react-hooks/set-state-in-effect
-    setItems(readList(key));
+    setItems(stored);
     setReady(true);
   }, [key]);
 
   const persist = useCallback(
     (next: string[]) => {
-      setItems(next);
-      if (typeof window !== "undefined") {
-        window.localStorage.setItem(key, JSON.stringify(next));
-      }
+      const normalized = [...new Set(next.filter((item) => item.length > 0))];
+      itemsRef.current = normalized;
+      setItems(normalized);
+      writeStorage(key, normalized);
     },
     [key],
   );
 
   const toggle = useCallback(
     (id: string) => {
-      persist(items.includes(id) ? items.filter((entry) => entry !== id) : [...items, id]);
+      const current = itemsRef.current;
+      persist(current.includes(id) ? current.filter((entry) => entry !== id) : [...current, id]);
     },
-    [items, persist],
+    [persist],
   );
 
   const has = useCallback((id: string) => items.includes(id), [items]);
   const clear = useCallback(() => persist([]), [persist]);
+  const replace = useCallback((next: string[]) => persist(next), [persist]);
 
-  return { items, ready, toggle, has, clear };
+  return { items, ready, toggle, has, clear, replace };
 }
 
 export function useShortlist() {
@@ -75,7 +98,7 @@ export function useShortlist() {
 }
 
 export function useCompareList() {
-  const { items, ready, toggle, has, clear } = useStoredList(COMPARE_KEY);
+  const { items, ready, toggle, has, clear, replace } = useStoredList(COMPARE_KEY);
   const add = useCallback(
     (id: string) => {
       if (items.includes(id) || items.length >= 3) return;
@@ -83,7 +106,7 @@ export function useCompareList() {
     },
     [items, toggle],
   );
-  return { items, ready, toggle, has, clear, add, full: items.length >= 3 };
+  return { items, ready, toggle, has, clear, replace, add, full: items.length >= 3 };
 }
 
 export function useSavedDeadlines() {
@@ -92,27 +115,30 @@ export function useSavedDeadlines() {
 
 export function useJourneyProgress() {
   const [steps, setSteps] = useState<Record<string, boolean>>({});
+  const stepsRef = useRef<Record<string, boolean>>({});
   const [ready, setReady] = useState(false);
 
   useEffect(() => {
     // Hydrate from localStorage after mount to avoid SSR hydration mismatches.
+    const stored = readMap(PROGRESS_KEY);
+    stepsRef.current = stored;
     // eslint-disable-next-line react-hooks/set-state-in-effect
-    setSteps(readMap(PROGRESS_KEY));
+    setSteps(stored);
     setReady(true);
   }, []);
 
   const persist = useCallback((next: Record<string, boolean>) => {
+    stepsRef.current = next;
     setSteps(next);
-    if (typeof window !== "undefined") {
-      window.localStorage.setItem(PROGRESS_KEY, JSON.stringify(next));
-    }
+    writeStorage(PROGRESS_KEY, next);
   }, []);
 
   const toggle = useCallback(
     (id: string) => {
-      persist({ ...steps, [id]: !steps[id] });
+      const current = stepsRef.current;
+      persist({ ...current, [id]: !current[id] });
     },
-    [steps, persist],
+    [persist],
   );
 
   const completedCount = Object.values(steps).filter(Boolean).length;
@@ -136,9 +162,7 @@ export function useChecklist(programId: string, itemIds: string[]) {
     (id: string) => {
       setState((current) => {
         const next = { ...current, [id]: !current[id] };
-        if (typeof window !== "undefined") {
-          window.localStorage.setItem(storageKey, JSON.stringify(next));
-        }
+        writeStorage(storageKey, next);
         return next;
       });
     },
@@ -161,9 +185,7 @@ export function readJson<T>(key: string): T | null {
 }
 
 export function writeJson(key: string, value: unknown): void {
-  if (typeof window !== "undefined") {
-    window.localStorage.setItem(key, JSON.stringify(value));
-  }
+  writeStorage(key, value);
 }
 
 export const ROADMAP_DRAFT_STORAGE = ROADMAP_DRAFT_KEY;

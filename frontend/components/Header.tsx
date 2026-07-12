@@ -1,13 +1,11 @@
 import Link from "next/link";
 
+import DesktopNav from "@/components/DesktopNav";
 import MobileNav from "@/components/MobileNav";
 
 function BrandMark() {
   return (
-    <span
-      aria-hidden="true"
-      className="relative grid size-9 place-items-center rounded-full bg-forest-900 text-white"
-    >
+    <span aria-hidden="true" className="relative grid size-9 place-items-center rounded-full bg-forest-900 text-white">
       <span className="absolute h-4 w-1 rotate-45 rounded-full bg-lime-300" />
       <span className="absolute size-2.5 -translate-x-1.5 translate-y-1.5 rounded-full border-2 border-white" />
     </span>
@@ -29,17 +27,7 @@ export default function Header() {
           </span>
         </Link>
 
-        <nav
-          aria-label="Primary navigation"
-          className="hidden items-center gap-6 text-sm font-medium text-slate-700 lg:flex"
-        >
-          <Link className="nav-link" href="/explore">Explore</Link>
-          <Link className="nav-link" href="/roadmap">Roadmap</Link>
-          <Link className="nav-link" href="/explain">Explain</Link>
-          <Link className="nav-link" href="/deadlines">Deadlines</Link>
-          <Link className="nav-link" href="/finance">Finance</Link>
-          <Link className="nav-link" href="/guides">Guides</Link>
-        </nav>
+        <DesktopNav />
 
         <div className="flex items-center gap-2">
           <MobileNav />
@@ -47,8 +35,8 @@ export default function Header() {
             href="/hub"
             className="inline-flex min-h-10 items-center justify-center rounded-full bg-forest-900 px-4 text-sm font-semibold text-white transition hover:bg-forest-700 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-forest-700 sm:px-5"
           >
-            <span className="sm:hidden">Hub</span>
-            <span className="hidden sm:inline">My hub</span>
+            <span className="sm:hidden">My plan</span>
+            <span className="hidden sm:inline">My control room</span>
           </Link>
         </div>
       </div>
