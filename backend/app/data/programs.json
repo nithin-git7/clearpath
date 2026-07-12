@@ -482,5 +482,76 @@
     "official_link": "https://www.h-brs.de/en/inf/admission-application-master-autonomous-systems",
     "last_verified": "2026-07-09",
     "source_note": "Official H-BRS admission page distinguishes visa-required applicants and routes them through uni-assist; catalog uses that India-relevant deadline track."
+  },
+  {
+    "id": "saarland-msc-computer-science", "university_id": "uni-saarland", "title": "M.Sc. Computer Science", "degree_level": "master",
+    "field": "Computer Science", "language": "English", "duration_semesters": 4, "tuition_eur": 0, "intakes": ["winter", "summer"],
+    "deadlines": [
+      {"intake": "summer", "deadline": "2026-11-15", "deadline_note": "Official late deadline for summer semester 2027. An early summer application deadline is 15 May."},
+      {"intake": "winter", "deadline": "2027-05-15", "deadline_note": "Official late deadline for winter semester 2027/28. An early winter application deadline is 15 November of the preceding year."}
+    ],
+    "requirements_summary": "Bachelor or equivalent in computer science or a related field, strong academic record, English at C1, motivation statement, and two academic references. A medium-of-instruction letter is not accepted as English proof.",
+    "official_link": "https://www.uni-saarland.de/en/study/programmes/master/informatics.html", "last_verified": "2026-07-12",
+    "source_note": "Applications use the Saarland Informatics Campus department portal. The official page lists early and late application rounds for both intakes."
+  },
+  {
+    "id": "saarland-msc-data-science-ai", "university_id": "uni-saarland", "title": "M.Sc. Data Science and Artificial Intelligence", "degree_level": "master",
+    "field": "Data Science", "language": "English", "duration_semesters": 4, "tuition_eur": 0, "intakes": ["winter", "summer"],
+    "deadlines": [
+      {"intake": "summer", "deadline": "2026-11-15", "deadline_note": "Official late deadline for summer semester 2027. An early summer application deadline is 15 May."},
+      {"intake": "winter", "deadline": "2027-05-15", "deadline_note": "Official late deadline for winter semester 2027/28. An early winter application deadline is 15 November of the preceding year."}
+    ],
+    "requirements_summary": "Bachelor in computer science or a related field with substantial mathematics, theoretical and practical computer science, machine learning, AI, and data-mining preparation; English at C1; motivation dossier and two references.",
+    "official_link": "https://www.uni-saarland.de/en/study/programmes/master/data-science.html", "last_verified": "2026-07-12",
+    "source_note": "The official program page states no tuition fees and uses the department application portal with early and late rounds."
+  },
+  {
+    "id": "tuhh-msc-data-science", "university_id": "tu-hamburg", "title": "M.Sc. Data Science", "degree_level": "master",
+    "field": "Data Science", "language": "English", "duration_semesters": 4, "tuition_eur": 0, "intakes": ["winter"],
+    "deadlines": [{"intake": "winter", "deadline": "2027-03-01", "deadline_note": "Non-EU applicants without EU residence use the pre-check and online application from 1 December to 1 March for winter intake."}],
+    "requirements_summary": "Relevant bachelor's degree with suitable data science, computer science, mathematics, and statistics preparation. International non-EU applicants complete TU Hamburg's pre-check before the online application.",
+    "official_link": "https://www.tuhh.de/tuhh/studium/vor-dem-studium/studienangebot/international-study-programs/data-science", "last_verified": "2026-07-12",
+    "source_note": "The official page distinguishes the 1 March non-EU deadline from the 15 July EU/EU-resident deadline. The catalog shows the non-EU route."
+  },
+  {
+    "id": "fau-bsc-artificial-intelligence", "university_id": "fau-erlangen", "title": "B.Sc. Artificial Intelligence", "degree_level": "bachelor",
+    "field": "Artificial Intelligence", "language": "English", "duration_semesters": 6, "tuition_eur": 0, "intakes": ["winter"],
+    "deadlines": [{"intake": "winter", "deadline": "2026-05-31", "deadline_note": "Published international deadline for winter semester 2026/27. The next cycle has not yet been published; verify before planning for 2027."}],
+    "requirements_summary": "Recognized university entrance qualification, English at B1 or higher, and successful qualification assessment. International applicants use FAU's Campo platform.",
+    "official_link": "https://www.ai.study.fau.eu/prospective-students/bachelor-ai/application/", "last_verified": "2026-07-12",
+    "source_note": "The official page currently publishes the 2026 international deadline only. FAU charges non-EU applicants a separate EUR 100 application fee from winter 2026/27."
+  },
+  {
+    "id": "bremen-msc-computer-science", "university_id": "uni-bremen", "title": "M.Sc. Computer Science", "degree_level": "master",
+    "field": "Computer Science", "language": "German", "duration_semesters": 4, "tuition_eur": 0, "intakes": ["winter", "summer"],
+    "deadlines": [
+      {"intake": "winter", "deadline": "2026-07-15", "deadline_note": "The official program page shows an extension to 15 July for winter semester 2026/27; the regular period ends 31 May."},
+      {"intake": "summer", "deadline": "2027-01-15", "deadline_note": "Official regular application deadline for summer semester 2027."}
+    ],
+    "requirements_summary": "Relevant bachelor's degree meeting the subject-specific admission regulations and the required German language proof. Applications are submitted through the moin portal.",
+    "official_link": "https://www.uni-bremen.de/en/studies/orientation-application/offered-study-program/dbs/study/computer-science-master", "last_verified": "2026-07-12",
+    "source_note": "The program is taught in German, with four-semester full-time study and no admission restriction."
+  },
+  {
+    "id": "goettingen-msc-applied-computer-science", "university_id": "uni-goettingen", "title": "M.Sc. Applied Computer Science", "degree_level": "master",
+    "field": "Computer Science", "language": "English", "duration_semesters": 4, "tuition_eur": 0, "intakes": ["winter", "summer"],
+    "deadlines": [
+      {"intake": "summer", "deadline": "2026-10-15", "deadline_note": "Usual deadline for international applicants outside the EU/EEA for summer semester 2027; confirm when the round opens."},
+      {"intake": "winter", "deadline": "2027-04-15", "deadline_note": "Usual deadline for international applicants outside the EU/EEA for winter semester 2027/28; confirm when the round opens."}
+    ],
+    "requirements_summary": "Relevant bachelor's degree, required computer science and mathematics background, English proficiency, CV, and motivation letter. The faculty performs the admission review directly.",
+    "official_link": "https://www.uni-goettingen.de/en/619514.html", "last_verified": "2026-07-12",
+    "source_note": "The official page gives separate non-EU/EEA deadlines. Future entries use its published recurring dates and are marked for confirmation when each round opens."
+  },
+  {
+    "id": "jena-msc-computational-data-science", "university_id": "uni-jena", "title": "M.Sc. Computational and Data Science", "degree_level": "master",
+    "field": "Data Science", "language": "German", "duration_semesters": 4, "tuition_eur": 0, "intakes": ["winter", "summer"],
+    "deadlines": [
+      {"intake": "summer", "deadline": "2027-01-15", "deadline_note": "Official non-EU application deadline for summer semester 2027."},
+      {"intake": "winter", "deadline": "2027-05-31", "deadline_note": "Official non-EU application deadline for winter semester 2027/28."}
+    ],
+    "requirements_summary": "Relevant 180-ECTS degree with defined mathematics and computer science preparation, German at DSH-2 or an accepted equivalent, and good English. Applications use Friedolin 2.0.",
+    "official_link": "https://www.uni-jena.de/en/6630/m-sc-computational-and-data-science", "last_verified": "2026-07-12",
+    "source_note": "The official program and faculty pages provide separate non-EU deadlines and confirm no tuition fee."
   }
 ]

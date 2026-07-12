@@ -268,5 +268,41 @@
     "official_link": "https://www.h-brs.de/en/study",
     "last_verified": "2026-07-09",
     "source_note": "Visa-required applicants with a foreign bachelor's degree use uni-assist for the Autonomous Systems M.Sc.; winter 2026/27 semester fee is EUR 367.00."
+  },
+  {
+    "id": "uni-saarland", "name": "Saarland University", "city": "Saarbruecken", "state": "Saarland", "type": "public",
+    "website": "https://www.uni-saarland.de/en/home.html", "application_route": "direct", "vpd_required": false, "semester_fee_eur": 412,
+    "languages": ["English", "German"], "official_link": "https://www.uni-saarland.de/en/study/programmes/master.html", "last_verified": "2026-07-12",
+    "source_note": "The Computer Science department uses its own application portal. The official winter 2026/27 semester contribution is EUR 412.30 including the Germany semester ticket."
+  },
+  {
+    "id": "tu-hamburg", "name": "Hamburg University of Technology", "city": "Hamburg", "state": "Hamburg", "type": "public",
+    "website": "https://www.tuhh.de/tuhh/en/", "application_route": "direct", "vpd_required": false, "semester_fee_eur": 384,
+    "languages": ["English", "German"], "official_link": "https://www.tuhh.de/tuhh/en/studying/before-studying/application", "last_verified": "2026-07-12",
+    "source_note": "Non-EU applicants to international English-language master's programs use TU Hamburg's pre-check and online process. EUR 384 is the latest published semester contribution."
+  },
+  {
+    "id": "fau-erlangen", "name": "Friedrich-Alexander University Erlangen-Nuremberg", "city": "Erlangen", "state": "Bavaria", "type": "public",
+    "website": "https://www.fau.eu/", "application_route": "direct", "vpd_required": false, "semester_fee_eur": 82,
+    "languages": ["English", "German"], "official_link": "https://www.fau.eu/studying/applications-and-enrolment/", "last_verified": "2026-07-12",
+    "source_note": "FAU's published semester contribution is EUR 82. From winter 2026/27, applicants from non-EU countries pay a separate EUR 100 fee per application."
+  },
+  {
+    "id": "uni-bremen", "name": "University of Bremen", "city": "Bremen", "state": "Bremen", "type": "public",
+    "website": "https://www.uni-bremen.de/en/", "application_route": "direct", "vpd_required": false, "semester_fee_eur": 425,
+    "languages": ["German", "English"], "official_link": "https://www.uni-bremen.de/en/studies/orientation-application/applying-for-studies", "last_verified": "2026-07-12",
+    "source_note": "Applications use the moin portal. The official program page lists an approximate semester fee of EUR 425 including the semester ticket."
+  },
+  {
+    "id": "uni-goettingen", "name": "University of Goettingen", "city": "Goettingen", "state": "Lower Saxony", "type": "public",
+    "website": "https://www.uni-goettingen.de/en/1.html", "application_route": "direct", "vpd_required": false, "semester_fee_eur": 484,
+    "languages": ["English", "German"], "official_link": "https://www.uni-goettingen.de/en/study/1.html", "last_verified": "2026-07-12",
+    "source_note": "The winter 2026/27 enrolment and re-registration contribution is EUR 484.18. Master's applications use the responsible faculty's online process."
+  },
+  {
+    "id": "uni-jena", "name": "Friedrich Schiller University Jena", "city": "Jena", "state": "Thuringia", "type": "public",
+    "website": "https://www.uni-jena.de/en/", "application_route": "direct", "vpd_required": false, "semester_fee_eur": 333,
+    "languages": ["German", "English"], "official_link": "https://www.uni-jena.de/en/studies", "last_verified": "2026-07-12",
+    "source_note": "Master's applications use Friedolin 2.0 and the Master Service Centre. The program page lists a semester contribution of EUR 333.05 and no tuition fee."
   }
 ]

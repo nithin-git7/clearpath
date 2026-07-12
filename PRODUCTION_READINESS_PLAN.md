@@ -177,7 +177,7 @@ The release is complete only when:
 
 ### Information refresh
 
-- Reviewed changing guidance on 2026-07-11 using Federal Foreign Office, Make it in Germany, uni-assist, APS India, APS China, and official German mission sources.
+- Reviewed changing guidance on 2026-07-12 using Federal Foreign Office, Make it in Germany, uni-assist, APS India, and official university sources; APS China remains individually dated to its last dedicated review.
 - Updated the 2026 financial-proof reference, student work allowance, uni-assist/VPD timing, APS India 2026/27 and summer 2027 notices, health-insurance wording, arrival registration, and Consular Services Portal availability.
 - Kept case-specific caveats beside high-risk facts and linked every actionable claim to the responsible official source.
 

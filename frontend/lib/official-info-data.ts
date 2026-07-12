@@ -9,7 +9,7 @@ export interface OfficialFact {
   caution: string;
 }
 
-export const SITE_INFORMATION_LAST_REVIEWED = "2026-07-11";
+export const SITE_INFORMATION_LAST_REVIEWED = "2026-07-12";
 
 export const OFFICIAL_FACTS = {
   studentFinance: {

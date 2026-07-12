@@ -8,7 +8,7 @@ The product is an educational planning tool. It is not legal or immigration advi
 
 ## Current status
 
-ClearPath Germany is now a production-oriented, private-by-default application control room. The responsive frontend includes situation-led onboarding, a unified readiness dashboard, 19 universities and 27 programs, deadline health states, shortlist and comparison tools, an itemized finance planner, personalized roadmap, pasted-text explainer, India-first APS guidance, guides, search, error recovery, and production metadata.
+ClearPath Germany is now a production-oriented, private-by-default application control room. The responsive frontend includes situation-led onboarding, a unified readiness dashboard, 25 universities and 34 programs, deadline health states, shortlist and comparison tools, an itemized finance planner, personalized roadmap, pasted-text explainer, India-first APS guidance, guides, search, error recovery, and production metadata.
 
 The FastAPI service validates catalog dates and official HTTPS sources, serves deterministic roadmap and explainer workflows, and is covered by regression and safety fixtures. High-risk guidance is dated and source-linked; users are still expected to verify their exact case with the responsible authority. Authentication, uploads, payments, cloud sync, broad scraping, and heavy AI/RAG remain intentionally deferred because they add privacy and maintenance risk without being required for the core planning problem.
 
