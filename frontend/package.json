@@ -5,7 +5,9 @@
   "scripts": {
     "dev": "vinext dev",
     "build": "vinext build",
+    "build:vercel": "next build",
     "start": "vinext start",
+    "start:vercel": "next start",
     "lint": "eslint .",
     "typecheck": "tsc --noEmit"
   },
