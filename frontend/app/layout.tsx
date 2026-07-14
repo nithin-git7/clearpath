@@ -1,6 +1,7 @@
 import type { Metadata, Viewport } from "next";
 import { headers } from "next/headers";
 import type { ReactNode } from "react";
+import { Analytics } from "@vercel/analytics/next";
 
 import Header from "@/components/Header";
 import "@/styles/globals.css";
@@ -58,6 +59,7 @@ export default function RootLayout({ children }: Readonly<{ children: ReactNode 
         <a className="skip-link" href="#main-content">Skip to main content</a>
         <Header />
         {children}
+        <Analytics />
       </body>
     </html>
   );
